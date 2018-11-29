@@ -40,7 +40,7 @@ function clusters = dbscan3(data, dmax, minpt, covariance, wcov, ~)
                 linspace(colmin, colmax, ceil(ndata/6))', linspace(colmin, colmin, ceil(ndata/6))', linspace(colmax, colmax, ceil(ndata/6))';
                 linspace(colmax, colmax, ceil(ndata/6))', linspace(colmin, colmin, ceil(ndata/6))', linspace(colmax, colmin, ceil(ndata/6))'];
     
-            
+           
     % Algorithm:
     while nnz(clusters) < ndata
         % Chosing point:
@@ -52,6 +52,9 @@ function clusters = dbscan3(data, dmax, minpt, covariance, wcov, ~)
             if nnz(curclust) ~= 0
                 % Updating clusters:
                 clusters(curclust == 1) = max(clusters) + 1; 
+                if length(find(curclust == 1)) == length(clusters)
+                    break
+                end
                 % Updating data:
                 comparison = sum(datai(:, 1) == find(curclust == 0)', 2);
                 datai = datai(comparison == 1, :);
@@ -86,6 +89,7 @@ function clusters = dbscan3(data, dmax, minpt, covariance, wcov, ~)
             end
             curclust(toadd) = 1;
         end
+%         % Monitoring how the algorithm works:
 %         [nnz(clusters), nnz(curclust), length(nextinline), sum(dist(:, 1) == 0), size(datai, 1)]
     end
     
