@@ -19,7 +19,7 @@ function [out, variables, perinf] = h5stimreg(h5file, Params)
 %  --Params[optional]: structure containing parameters for the function. 
 %    Fields are:
 %       --Params.period (default: 0): if 0 taking all stimulus, else taking 
-%         a certain number of periods.
+%         a certain number of periods if 1.
 %       --Params.nperiod (default: 1): number of periods on which to 
 %         average.
 %       --Params.expdecay (default: 2.6): time constant for exponential 
