@@ -51,15 +51,29 @@ function [out, variables, perinf] = h5stimreg(h5file, Params)
     tic
     fprintf('\n\nStarting program h5stimreg, for regression against stimulus. \n');
     % Getting files:
-    stim = h5read(h5file, '/Data/Stimulus');
-    time = h5read(h5file, '/Data/Times');
+    try
+        stim = h5read(h5file, '/Data/Stimulus');
+    catch
+        stim = h5read(h5file, '/Data/stimulus'); 
+    end
+    try
+        time = h5read(h5file, '/Data/Times');
+    catch
+        time = h5read(h5file, '/Data/times'); 
+    end
     try
         dff = h5read(h5file, '/Data/DFF');
     catch
-        dff = h5read(h5file, '/Data/Values');
+        try
+            dff = h5read(h5file, '/Data/dff');
+        catch
+            dff = h5read(h5file, '/Data/Values'); 
+        end
     end
     % Getting dimensions:
     [nneu, ntime] = size(dff);
+    if size(time, 1) > size(time, 2); time = time'; end
+    if size(stim, 1) > size(stim, 2); stim = stim'; end
     if ntime ~= size(stim, 2) || ntime ~= size(time, 2)
         error('Please provide stimulus, times and signals with same number of time increments')
     end
@@ -155,6 +169,7 @@ function [out, variables, perinf] = h5stimreg(h5file, Params)
     % Indication:
     fprintf('\nInitialization done in %.3f seconds, starting loop for each neuron. \n\n', toc);
     % Main loop:
+    warning('off')
     for i = 1:nneu
         [b, ~, r, ~, stats] = regress(dffn(i, :)', variables);
         out.coef(i, :) = b(2:end)';
@@ -168,7 +183,8 @@ function [out, variables, perinf] = h5stimreg(h5file, Params)
         if mod(i, 5000) == 0
             fprintf('Iteration %.0f out of %.0f, done in %.3f seconds. \n', [i, nneu, toc]);
         end
-    end      
+    end     
+    warning('on')
     % End of program indication:
     fprintf('\nFunction h5stimreg ended in %.3f seconds. \n', toc);
     

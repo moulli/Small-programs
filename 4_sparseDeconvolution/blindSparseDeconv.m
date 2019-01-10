@@ -12,7 +12,7 @@ snr = 5;
 sigma = a/snr;
 
 % Spike train:
-ltrain = 500*60;
+ltrain = 10*60;
 fsig = 0.08;
 fe = 2.5;
 N = zeros(1, ltrain);
@@ -201,5 +201,111 @@ for i = 1:length(lambda)
 end
 
 
+%% Presentation: 
+
+% Constants:
+a = 100;
+b = 0.01;
+dt = 0.01;
+snr = 50;
+sigma = a/snr;
+
+% Spike train:
+ltrain = 10*60;
+fsig = 0.2;
+fe = 2.5;
+N = zeros(1, ltrain);
+spikes = sin(fsig .* (dt:dt:ltrain*dt) .* 2 .* pi) + randn(1, ltrain) ;
+% spikes = unique([1:40:ltrain, 3:41:ltrain, 2:42:ltrain, 4:25:ltrain]);
+N(spikes > 1.5) = 1;
+
+% Convolution kernel:
+taud = 0.5;
+taur = 0.05;
+kern = @(t, taud, taur) (exp(-t./taud) - exp(-t./taur)) ./ max((exp(-(0:dt:3)./taud) - exp(-(0:dt:3)./taur)));
+
+% Value of calcium signal:
+F = zeros(size(N));
+Fnonoise = zeros(size(N));
+taunn = [];
+for i = 1:length(N)
+    Ntemp = N(1:i);
+%     taunn = find(fliplr(Ntemp) == 1) - 1;
+    if Ntemp(end) == 1
+        taunn = [0, taunn+1];
+    else
+        taunn = taunn + 1;
+    end
+    intemp = sum(kern(taunn * dt, taud, taur)) * dt;
+    F(i) = a * intemp + b + sigma * randn(1);
+    Fnonoise(i) = a * intemp + b;
+end
+figure
+t = dt:dt:ltrain*dt;
+tc = dt/2:dt/2:ltrain*dt;
+Nw = reshape([zeros(1, ltrain); N], 1, length(tc));
+Nw = 0.1 * max(F) * Nw + b;
+subplot(4, 1, 1)
+plot(tc, Nw, 'k')
+grid on
+title('Spike train', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+subplot(4, 1, 2:4)
+plot(t, F, 'Color', [1, 0.8, 0.2])
+grid on
+title('Calcium signal', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+
+figure
+subplot(4, 1, 1:3)
+plot(t, F, 'Color', [1, 0.8, 0.2])
+grid on
+title('Calcium signal', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+subplot(4, 1, 4)
+plot(tc, Nw, 'k')
+grid on
+title('Spike train', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+
+
+t = 0:0.4:2.8;
+gg = kern(t, taud, taur);
+for i = 1:30; K(i:i+7, i) = gg'; end
+K = K(1:30, :);
+N = rand(1, 30);
+N(N > 0.7) = 1;
+N(N <= 0.7) = 0;
+t = 0:0.4:29*0.4;
+figure; 
+subplot(4, 4, 1:3); Np = reshape([N; zeros(size(N))], 1, 60); tp = 0:0.2:59*0.2; plot(tp, Np, 'k'); 
+axis([0, 59*0.2+0.8, 0, 1.5])
+subplot(4, 4, [5, 6, 7, 9, 10, 11, 13, 14, 15]); image(K, 'CDataMapping', 'scaled'); colorbar; 
+subplot(4, 4, [8, 12, 16]); plot(K*N', t, 'r'); set(gca,'ydir','reverse'); grid on
+axis([0, max(K*N')+0.1, 0, max(t)])
+
+
+
+%% Trying genSetConv:
+
+params.nex = 10;
+params.pts = 500;
+params.fs = 2.5;
+params.fr = 1000;
+params.taur = [0.01, 0.1];
+params.taud = [0.1, 1];
+params.a = 100;
+params.b = -10;
+params.noise = 10;
+params.ssec = 100;
+params.per = 30;
+params.perinf = 0.01;
+params.indic = 10;
+[data, info, N] = genSetConv(params);
+figure
+hold on
+for i = 1:size(data, 2)
+    plot(0:params.pts-1, data(:, i))
+end
 
 

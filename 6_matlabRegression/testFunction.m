@@ -7,9 +7,9 @@ clear; close all; clc
 sinstim = 0;
 switch sinstim
     case 0
-        cd '/home/ljp/Science/GeoffreysComputer/RLS/Data/2018-05-24/Run 08/Analysis/HDF5'
+        cd '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/Data/2018-05-24/Run 08/Analysis/HDF5'
     case 1
-        cd '/home/ljp/Science/GeoffreysComputer/RLS/Data/2018-06-14/Run 03/Analysis/HDF5'
+        cd '/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2018-06-14/Run 03/Analysis/HDF5'
 end
 
 
@@ -128,7 +128,7 @@ Params.minpt = 20;
 Params.plot = 0;
 Params.fprint = 500;
 Params.monitor = 0;
-out = dbscan(refcok, Params);
+outout = dbscan(refcok, Params);
 
 indref1 = find(refcok(:, 1) <= 0.25);
 indref2 = find(refcok(:, 1) > 0.25);
@@ -162,8 +162,149 @@ end
 
 %% Testing h5regress function:
 
-[out2, variables2, perinf2] = h5regress(hippo, variables(:, 2:end)');
-isequal(out, out2) % nope, because signal renormalized
+% [out2, variables2, perinf2] = h5regress(hippo, variables(:, 2:end)');
+% isequal(out, out2) % nope, because signal renormalized
+
+
+
+% datatest = rand(1000, 2);
+% figure; plot(datatest(:, 1), datatest(:, 2), '.'); grid on
+% Params = struct;
+% Params.dmax = 0.05;
+% Params.minpt = 10;
+% weight = rand(1000, 1);
+% weight(weight > 0.9) = 100;
+% Params.weight = weight;
+% Params.pweight = 1;
+% Params.plot = 1;
+% Params.fprint = 500;
+% Params.monitor = 0;
+% out = dbscan(datatest, Params);
+
+
+
+%% Plotting depending on coefficients:
+
+coeff = out.coef;
+nstim = size(coeff, 2);
+keepneu = cell(1, nstim);
+figure
+for i = 1:nstim
+    cotemp = coeff(:, i);
+    keepneu{i} = find(cotemp < mean(cotemp)-2*std(cotemp) | cotemp > mean(cotemp)+2*std(cotemp));
+    keepcoef = coeff(keepneu{i}, i);
+    keepcoef = (keepcoef - min(keepcoef)) ./ (max(keepcoef) - min(keepcoef));
+    subplot(2, 2, i)
+    scatter3(refco(keepneu{i}, 1), refco(keepneu{i}, 2), refco(keepneu{i}, 3), ...
+                 [], [keepcoef, 1-keepcoef, keepcoef], '.')
+    axis equal
+    view(0, 90)
+    grid on
+    title('Coefficient to one of 4 stimuli', 'Interpreter', 'latex')
+    xlabel('x-axis', 'Interpreter', 'latex')
+    ylabel('y-axis', 'Interpreter', 'latex')
+    zlabel('z-axis', 'Interpreter', 'latex')
+end
+
+
+% dffnb = dffn(bzones{1, 1}, :);
+% meand = zeros(size(dffnb, 1));
+% for i = 2:size(dffnb, 1)
+%     for j = 1:i
+%         meand(i, j) = sqrt(sum((dffnb(i, :)-dffnb(j, :)).^2));
+%     end
+% end
+% meand = meand + meand';
+% figure
+% image(meand, 'CDataMapping', 'scaled')
+% colorbar
+        
+
+
+%% Comparing vestibular and thermotaxis:
+
+Params.period = 0;
+[outV, variablesV, perinfV] = h5stimreg(hippo, Params);
+addpath('/home/ljp/Science/Guillaume/Thermotaxis/Datasets')
+% hippoT = '20171115_Run06Tset=27.h5';
+hippoT = '20180111_Run04Tset=14.h5';
+[outT, variablesT, perinfT] = h5stimreg(hippoT, Params);
+figure
+subplot(2, 1, 1)
+hold on
+[~, n1] = max(outT.R2score);
+plot(perinfT{3}(n1, :))
+plot(sum(outT.coef(n1, :) .* variablesT(:, 2:end), 2) + outT.intercept(n1))
+plot(perinfT{2})
+title('Highest R2 score signal, with regression and stimulus', 'Interpreter', 'latex')
+subplot(2, 1, 2)
+hold on
+n2 = randperm(size(perinfT{3}, 1), 1);
+plot(perinfT{3}(n2, :))
+plot(sum(outT.coef(n2, :) .* variablesT(:, 2:end), 2) + outT.intercept(n2))
+plot(perinfT{2})
+title('Random signal, with regression and stimulus', 'Interpreter', 'latex')
+
+% Plotting neurons with high F-stat and high coefficients:
+%Parameters:
+dffT = h5read(hippoT, '/Data/dff');
+nneuT = size(dffT, 1);
+qT = 10;
+% Coefficients:
+coefT = sqrt(sum((outT.coef.^2), 2));
+[maxcoefT, indcoefT] = sort(coefT, 'descend');
+indcKT = sort(indcoefT(1:ceil(nneuT/qT)));
+% F-stat:
+fstatT = outT.Fstat;
+[maxfstatT, indfstatT] = sort(fstatT, 'descend');
+indfKT = sort(indfstatT(1:ceil(nneuT/qT)));
+% Taking indices that are in both vectors:
+compaT = sum(indcKT == indfKT', 2);
+indfinT = indcKT(compaT == 1);
+% Computing F-stat and coefficients for neurons kept:
+indfinfT = ((1 ./ fstatT(indfinT)) - (1 ./ max(fstatT(indfinT)))) ./ (1 ./ min(fstatT(indfinT)));
+indfincT = ((1 ./ coefT(indfinT)) - (1 ./ max(coefT(indfinT)))) ./ (1 ./ min(coefT(indfinT)));
+indindT = (indfinfT.*indfincT - min(indfinfT.*indfincT)) ./ max(indfinfT.*indfincT);
+
+% Plotting:
+refcoT = double(h5read(hippoT, '/Data/zbrain_coords'));
+refcoT(:, 2) = max(refcoT(:, 2)) - refcoT(:, 2);
+refcoT = ((refcoT - min(refcoT)) ./ (max(refcoT) - min(refcoT))) .* (max(refco) - min(refco)) + min(refco);
+figure; subplot(1, 2, 1); scatter3(refco(:, 1), refco(:, 2), refco(:, 3)); axis equal; subplot(1, 2, 2); scatter3(refcoT(:, 1), refcoT(:, 2), refcoT(:, 3)); axis equal
+figure
+hold on
+grid on
+axis equal
+scatter3(refcoT(indfinT, 1), refcoT(indfinT, 2), refcoT(indfinT, 3), [], [indindT, indindT, indindT], '.')
+axis equal
+title('Neurons with high F-stat and high regression coefficients (thermotaxis)', 'Interpreter', 'latex')
+xlabel('x-coordinate', 'Interpreter', 'latex')
+ylabel('y-coordinate', 'Interpreter', 'latex')
+zlabel('z-coordinate', 'Interpreter', 'latex')
+
+figure
+subplot(1, 2, 1)
+hold on
+grid on
+axis equal
+scatter3(refcoT(indfinT, 1), refcoT(indfinT, 2), refcoT(indfinT, 3), [], [indfinfT, 0.9*ones(size(indfinfT)), 0.9*ones(size(indfinfT))], '.')
+axis equal
+title('Neurons with high F-stat (thermotaxis)', 'Interpreter', 'latex')
+xlabel('x-coordinate', 'Interpreter', 'latex')
+ylabel('y-coordinate', 'Interpreter', 'latex')
+zlabel('z-coordinate', 'Interpreter', 'latex')
+subplot(1, 2, 2)
+hold on
+grid on
+axis equal
+scatter3(refcoT(indfinT, 1), refcoT(indfinT, 2), refcoT(indfinT, 3), [], [0.9*ones(size(indfinfT)), indfincT, 0.9*ones(size(indfinfT))], '.')
+axis equal
+title('Neurons with high regression coefficients (thermotaxis)', 'Interpreter', 'latex')
+xlabel('x-coordinate', 'Interpreter', 'latex')
+ylabel('y-coordinate', 'Interpreter', 'latex')
+zlabel('z-coordinate', 'Interpreter', 'latex')
+
+
 
 
 

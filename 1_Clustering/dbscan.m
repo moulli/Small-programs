@@ -7,10 +7,7 @@ function out = dbscan(data, Params)
 %  entourage has at least a certain number of points. This gets rid of the 
 %  points that are considered noise. Basic algorithm is improved with a new 
 %  parameter: user can chose to add a weight to each point, to give more 
-%  importance to certain points, and modulate this weight. Another
-%  improvement is the fact that instead of having a rigid maximum distance,
-%  the scalar given by user will define the standard deviation in the
-%  smoothing gaussian.
+%  importance to certain points, and modulate this weight. 
 %
 %
 %% Parameters:
@@ -69,7 +66,8 @@ function out = dbscan(data, Params)
     end
     % Normalizing weights:
     if length(unique(Params.weight)) ~= 1
-        Params.weight = 4 * Params.pweight * (Params.weight - min(Params.weight)) ./ (max(Params.weight) - min(Params.weight)) - 2;
+        Params.weight = 1.5 * (Params.weight - min(Params.weight)) ./ (max(Params.weight) - min(Params.weight)) + 0.5;
+        Params.weight = Params.pweight*Params.weight.*(Params.weight >= 1) + (1/Params.pweight)*Params.weight.*(Params.weight < 1);
     end
     % Initialize variables and output:
     data = [(1:ndata)', data, Params.weight]; % to keep track
@@ -116,9 +114,9 @@ function out = dbscan(data, Params)
         end
         % Computing distance:
         disttot = [datai(:, 1), sqrt(sum((datai(:, 2:end-1) - data(pti, 2:end-1)).^2, 2)), zeros(size(datai(:, 1)))]; % with index for facility
-        disttot(:, 3) = datai(:, end) .* normpdf(disttot(:, 2), 0, Params.dmax) ./ normpdf(Params.dmax, 0, Params.dmax);
-        dist = disttot(disttot(:, 2) < Params.dmax, :);
-        lendist = sum(disttot(:, 3)) - normpdf(0, 0, Params.dmax) ./ normpdf(Params.dmax, 0, Params.dmax);
+        disttot(:, 3) = disttot(:, 2) ./ datai(:, end);
+        dist = disttot(disttot(:, 3) < Params.dmax, :);
+        lendist = size(dist, 1);
         % Assigning clusters:
         if lendist < Params.minpt && curclust(pti) == 0
             % Noise point:

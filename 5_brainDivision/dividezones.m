@@ -4,8 +4,13 @@ clear; close all; clc
 
 %% Going to the right address:
 
-% cd '/home/ljp/Science/GeoffreysComputer/RLS/Data/2018-06-14/Run 03/Analysis/HDF5'
-cd '/home/ljp/Science/GeoffreysComputer/RLS/Data/2018-05-24/Run 08/Analysis/HDF5'
+sinstim = 0;
+switch sinstim
+    case 0
+        cd '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/Data/2018-05-24/Run 08/Analysis/HDF5'
+    case 1
+        cd '/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2018-06-14/Run 03/Analysis/HDF5'
+end
 
 
 
@@ -33,7 +38,7 @@ nvalues = (values-mean(values, 2)) ./ std(values, [], 2);
 
 %% Importing MaskDatabase
 
-addpath('~/Science/Hippolyte/Small-programs/inhibited_neurons');
+addpath(genpath('~/Science/Hippolyte/Small-programs'));
 importfile('~/Science/Hippolyte/MaskDatabase.mat');
 
 
@@ -136,9 +141,6 @@ end
 
 
 %% K-means:
-
-addpath('~/Science/Hippolyte/Small-programs')
-addpath('~/Science/Hippolyte/Small-programs/braindivision')
    
 % nite = 30;
 % rmsestop = 0.001;
@@ -180,15 +182,31 @@ load('nsigiKd.mat')
 %     end
 % end
 load('nsigiKd2.mat')
+nsigiKd2f = cell(size(bzones));
+for i = 1:size(nsigiKd2f, 1)
+    for j = 1:size(nsigiKd2f, 2)
+        centij = nsigiKd2{i, j}{1};
+        minclustij = nsigiKd2{i, j}{2};
+        clustij = unique(minclustij);
+        nsignew = zeros(length(clustij), size(valij, 2));
+        valij = nvalues(bzones{i, j}, :);
+        for k = 1:length(clustij)
+            nsignew(k, :) = mean(valij(minclustij == clustij(k), :));
+        end
+        % Allocating to nsignal:
+        nsigiKd2f{i, j} = nsignew;
+    end
+end
 
-% % Reorganizing based on brain areas, from anterior to posterior
-% sortnsig = [5, 1, 2, 3, 4]';
-% nsigiKd = nsigiKd(sortnsig, :);
+
+% Reorganizing based on brain areas, from anterior to posterior
+sortnsig = [5, 1, 2, 3, 4]';
+nsigiKd2f = nsigiKd2f(sortnsig, :);
 
 sigtot = [];
-for i = 1:size(nsigiKd, 1)
-    for j = 1:size(nsigiKd, 2)
-        sigtot = [sigtot; nsigiKd{i, j}];
+for i = 1:size(nsigiKd2f, 1)
+    for j = 1:size(nsigiKd2f, 2)
+        sigtot = [sigtot; nsigiKd2f{i, j}];
     end
 end
 
@@ -395,15 +413,54 @@ end
 %% Adding stimulus to data:
 
 
+% if spikes == 1
+%     Nspikes = double(Nspikes > Pphys.threshold');
+% end
+% 
+% stimn = (stimulus - mean(stimulus)) ./ std(stimulus);
+% stimv = [0, stimulus(2:end)-stimulus(1:end-1)];
+% stimvn = (stimv - mean(stimv)) ./ std(stimv);
+% stima = [0, stimv(2:end)-stimv(1:end-1)];
+% stiman = (stima - mean(stima)) ./ std(stima);
+% if spikes == 1
+%     Nspikesn = Nspikes;
+% else
+%     Nspikesn = (Nspikes) ./ std(Nspikes(:));
+% end
+% 
+% if keepone == 1
+%     Nstot = [ones(1, Oalg.Time); stimn; stimvn; stiman; Nspikesn];
+% else
+%     Nstot = [stimn; stimvn; stiman; Nspikesn];
+% end
+% nones = size(Nstot, 1) - size(Nspikes, 1);
+
 if spikes == 1
     Nspikes = double(Nspikes > Pphys.threshold');
 end
 
+dt = 0.4;
+expkern =  exp(-(0:dt:(20*2.16))/2.16);
+
 stimn = (stimulus - mean(stimulus)) ./ std(stimulus);
-stimv = [0, stimulus(2:end)-stimulus(1:end-1)];
+stimnp = stimn .* (stimn > 0);
+stimnn = stimn .* (stimn < 0);
+ksp = convInd(stimnp, expkern, 1, length(stimulus));
+ksn = convInd(stimnn, expkern, 1, length(stimulus));
+
+stimv = gradient(stimn);
 stimvn = (stimv - mean(stimv)) ./ std(stimv);
-stima = [0, stimv(2:end)-stimv(1:end-1)];
+stimvnp = stimvn .* (stimvn > 0);
+stimvnn = stimvn .* (stimvn < 0);
+kvp = convInd(stimvnp, expkern, 1, length(stimulus));
+kvn = convInd(stimvnn, expkern, 1, length(stimulus));
+
+stima = gradient(stimvn);
 stiman = (stima - mean(stima)) ./ std(stima);
+stimanp = stiman .* (stiman > 0);
+stimann = stiman .* (stiman < 0);
+kap = convInd(stimanp, expkern, 1, length(stimulus));
+kan = convInd(stimann, expkern, 1, length(stimulus));
 if spikes == 1
     Nspikesn = Nspikes;
 else
@@ -411,9 +468,9 @@ else
 end
 
 if keepone == 1
-    Nstot = [ones(1, Oalg.Time); stimn; stimvn; stiman; Nspikesn];
+    Nstot = [ones(1, Oalg.Time); ksp; ksn; kvp; kvn; kap; kan; Nspikesn];
 else
-    Nstot = [stimn; stimvn; stiman; Nspikesn];
+    Nstot = [ksp; ksn; kvp; kvn; kap; kan; Nspikesn];
 end
 nones = size(Nstot, 1) - size(Nspikes, 1);
 
@@ -499,18 +556,18 @@ datatest = Ntest(:, 1:end-1);
 dataoutest = Ntest(nones+1:end, 2:end);
 % Compute output:
 ytemp = Wopt * datatest;
-yi = ytemp .* (ytemp > 0);
+yit = ytemp .* (ytemp > 0);
 % Compute RMSE:
-rmsetest = sqrt(mean(mean((yi - dataoutest).^2)));
-figure; plot(mean(dataoutest), '.'); hold on; plot(mean(yi), '.'); plot(mean((yi - dataoutest).^2), '.')
+rmsetest = sqrt(mean(mean((yit - dataoutest).^2)));
+figure; plot(mean(dataoutest), '.'); hold on; plot(mean(yit), '.'); plot(mean((yit - dataoutest).^2), '.')
 % figure; hold on; plot(yi(1, :)- dataoutest(1, :))
-figure; hold on; plot(yi(1, :)); plot(dataoutest(1, :))
+figure; hold on; plot(yit(1, :)); plot(dataoutest(1, :))
 fprintf('RMSE for training set is %.4f, for test set is %.4f \n', [rmsei(end), rmsetest]);
 
 if keepone == 1
-    col = ['k'; 'b'; 'r'; 'y'];
+    col = ['k'; 'b'; 'b'; 'r'; 'r'; 'y'; 'y'];
 else
-    col = ['b'; 'r'; 'y'];
+    col = ['b'; 'b'; 'r'; 'r'; 'y'; 'y'];
 end
 figure
 for i = 1:nones
@@ -535,16 +592,16 @@ colorbar('Ticks', (-length(tickslol):length(tickslol)),...
          'TickLabels', mat2cell(tickslab, ones(1, size(tickslab, 1)), size(tickslab, 2)))
 xline(1) = xline(1) + nones;
 line([xline(1), xline(1)], [xinit, xend(1)], 'Color', 'black')
-xzoned = zeros(size(nsigiKd, 1) * size(nsigiKd, 2), 1);
-for i = 1:size(nsigiKd, 1)
-    for j = 1:size(nsigiKd, 2)
-        if i == size(nsigiKd, 1) && j == size(nsigiKd, 2)
-            xzoned(size(nsigiKd, 2)*(i-1)+j) = size(nsigiKd{i, j}, 1);
+xzoned = zeros(size(nsigiKd2f, 1) * size(nsigiKd2f, 2), 1);
+for i = 1:size(nsigiKd2f, 1)
+    for j = 1:size(nsigiKd2f, 2)
+        if i == size(nsigiKd2f, 1) && j == size(nsigiKd2f, 2)
+            xzoned(size(nsigiKd2f, 2)*(i-1)+j) = size(nsigiKd2f{i, j}, 1);
             continue
         end
-        xzoned(size(nsigiKd, 2)*(i-1)+j) = size(nsigiKd{i, j}, 1);
-        xline(1) = xline(1) + size(nsigiKd{i, j}, 1);
-        xline(2) = xline(2) + size(nsigiKd{i, j}, 1);
+        xzoned(size(nsigiKd2f, 2)*(i-1)+j) = size(nsigiKd2f{i, j}, 1);
+        xline(1) = xline(1) + size(nsigiKd2f{i, j}, 1);
+        xline(2) = xline(2) + size(nsigiKd2f{i, j}, 1);
         line([xline(1), xline(1)], [xinit, xend(1)], 'Color', 'black')
         line([xinit, xend(2)], [xline(2), xline(2)], 'Color', 'black')
     end
@@ -631,6 +688,52 @@ title('Min synaptic weight for all major brain areas', 'Interpreter', 'latex')
 
 
 
+%% Plotting in continuous:
+
+matstim = [ksp; ksn; kvp; kvn; kap; kan];
+ntime = length(ksp);
+nclust = size(Nspikesn, 1);
+randneu = randperm(nclust, 1);
+NspikesnB = zeros(size(Nspikesn));
+NspikesnB(:, 1) = Nspikesn(:, 1);
+figure
+subplot(2, 1, 1)
+plot(0, stimulus(1), 'Color', [0.8, 0.8, 0])
+subplot(2, 1, 2)
+plot(0, Nspikesn(randneu, 1))
+hold on
+plot(0, NspikesnB(randneu, 1), 'r')
+hold off
+for i = 2:ntime
+    pause(0.001)
+    Nstemp = [matstim(:, i-1); NspikesnB(:, i-1)];
+    Nstemp = Wopt * Nstemp;
+    NspikesnB(:, i) = Nstemp .* (Nstemp > 0);
+    subplot(2, 1, 1)
+    plot(0:0.4:(0.4*(i-1)), stimulus(1:i), 'Color', [0.8, 0.8, 0])
+    subplot(2, 1, 2)
+    plot(0:0.4:(0.4*(i-1)), Nspikesn(randneu, 1:i))
+    hold on
+    plot(0:0.4:(0.4*(i-1)), NspikesnB(randneu, 1:i), 'r')
+    hold off
+end
+subplot(2, 1, 1)
+plot(0:0.4:(0.4*(i-1)), stimulus(1:i), 'Color', [0.8, 0.8, 0])
+title('Stimulus against time', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+subplot(2, 1, 2)
+plot(0:0.4:(0.4*(i-1)), Nspikesn(randneu, 1:i))
+hold on
+plot(0:0.4:(0.4*(i-1)), NspikesnB(randneu, 1:i), 'r')
+hold off
+legend('True signal', 'Approximated signal')
+title('Signals against time', 'Interpreter', 'latex')
+xlabel('Time [s]', 'Interpreter', 'latex')
+
+diff = sqrt(mean((Nspikesn - NspikesnB).^2));
+figure
+plot(diff, '.')
+
 
 
  
@@ -642,3 +745,39 @@ title('Min synaptic weight for all major brain areas', 'Interpreter', 'latex')
 
 
 
+function outkern = convInd(u, v, i1, i2)
+
+%% Function that performs convolution and keep only indicated indices.
+%
+%
+%% Parameters:
+%  --u: first vector to convolve.
+%  --v: second vector to convolve.
+%  --i1: index to which we start to keep information.
+%  --i2: index to which we stop to keep information.
+%
+%
+%% Output:
+%  --outkern: convolved vector, with i2-i1+1 components.
+
+
+
+    %% Initialization:
+    
+    if ~isrow(u) && ~iscolumn(u) 
+        error('Please provide first input as a vector')
+    elseif ~isrow(v) && ~iscolumn(v)
+        error('Please provide second input as a vector')
+    elseif i1 < 1 || i1 > i2 || i2 > length(u)+length(v)-1
+        error('Inputs must be as follow: 0 < input3 <= input4 < length(input1)+length(input2)')
+    end
+    
+    
+    %% Main code:
+    
+    outkern = conv(u, v);
+    outkern = outkern(i1:i2);   
+
+
+
+end
