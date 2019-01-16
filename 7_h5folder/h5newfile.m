@@ -43,13 +43,14 @@ overwrite = struct;
 overwrite.folder = false;
 overwrite.file = true;
 
-h5switch(a, nfolder, information, overwrite);
+h5switch(hippo, nfolder, information, overwrite);
 
 
 
 %% Opening new HDF5 file:
 
 hdf5test = fullfile(nfolder.path, nfolder.name, nfolder.filename);
+h5disp(hippo)
 h5disp(hdf5test)
 
 

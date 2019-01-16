@@ -108,6 +108,7 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     
     %% Metadata:
     
+    % Creation:
     h5create(nfolder.filename, '/Metadata', [1, 1], 'Datatype', 'double');
     h5write(nfolder.filename, '/Metadata', 1)
     % Experiment:
@@ -138,6 +139,45 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     
     %% Data:
     
+    % Getting path to HDF5 file:
+    h5old_G = [curdir, '/', h5old_Geoffrey];
+    % Times:
+    Times = h5read(h5old_G, '/Data/Times');
+    h5create(nfolder.filename, '/Data/Brain/Time', size(Times), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Time', Times)
+    h5writeatt(nfolder.filename, '/Data/Brain/Time', 'unit', 's')    
+    % Time delays:
+    TimeDelays = h5read(h5old_G, '/Data/TimeDelays');
+    h5create(nfolder.filename, '/Data/Brain/TimeDelays', size(TimeDelays), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/TimeDelays', TimeDelays)
+    h5writeatt(nfolder.filename, '/Data/Brain/TimeDelays', 'unit', 's') 
+    % Coordinates:
+    Coordinates = h5read(h5old_G, '/Data/Coordinates');
+    h5create(nfolder.filename, '/Data/Brain/Coordinates', size(Coordinates), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Coordinates', Coordinates)
+    h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'unit', 'mm') 
+    h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'space', 'RAS') 
+    % Reference coordinates:
+    RefCoordinates = h5read(h5old_G, '/Data/RefCoordinates');
+    h5create(nfolder.filename, '/Data/Brain/RefCoordinates', size(RefCoordinates), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/RefCoordinates', RefCoordinates)
+    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'unit', 'mm') 
+    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'space', 'RAS') 
+    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'reference brain', 'zbrain atlas')  
+    % Labels:
+    Labels = h5read(h5old_G, '/Data/Labels');
+    h5create(nfolder.filename, '/Data/Brain/Labels', size(Labels), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Labels', Labels)
+    h5writeatt(nfolder.filename, '/Data/Brain/Labels', 'origin', 'zbain atlas') 
+    % DFF:
+    Values = h5read(h5old_G, '/Data/Values');
+    h5create(nfolder.filename, '/Data/Brain/Analysis/Values', size(Values), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Analysis/Values', Values)
+    % Stimulus:
+    Stimulus = h5read(h5old_G, '/Data/Stimulus');
+    h5create(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], size(Stimulus), 'Datatype', 'double')
+    h5write(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], Stimulus)
+    h5writeatt(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'unit', 'degrees')
     
     
     
