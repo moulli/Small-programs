@@ -1,0 +1,74 @@
+Data and metadata structure for HDF5
+Names with caps are meant to become standards, without are examples
+a set can have a list of attributes 
+
+type:	    		[type] (floats as 32bits)
+attribute:  		(name, value)
+comment:    		# comment
+mandatory:  		!expression
+imposed name: 		Caps
+free to choose name: 	noCaps
+
+HDF5
+	Description [text]
+	!Metadata
+		!Larva
+			!Line [text]
+			!Age [float]
+				('unit' 'dpf')
+			!Id [text] # unique id, could be made with date/line/age/number
+		!Experiment
+			!Date # date of experiment
+			!Run # unique "id" of the run e.g. date, number
+			!Stimulus
+				nameofstimulus # nothing, if spontaneous activity
+					sensorytype [text] # 'vestibular'
+					stimulustype [text] # 'sinus', 'step'
+					frequency [float] # not defined if aperiodic
+						('unit', 'Hertz') 
+			Behaviour
+				nameofbehaviour
+					behaviourtype [text] # 'eye tracking'
+					aquisition frequency [float] # optional
+						('unit', 'Hertz') 
+		File
+			Created [datetime]
+			Program
+				Name
+				Hash # e.g. git commit hash
+	!Data
+		!Brain
+			!Time [float](1 × 3000)
+				('unit', 's')
+			TimeDelays [float](92644 × 1)
+				('unit', 's')
+			!Coordinates [float](92644 × 3)
+				('unit', 'mm')
+				('space', 'RAS')
+			RefCoordinates [float](92644 × 3)
+				('unit', 'mm')
+				('space', 'RAS')
+				('ReferenceBrain') # 'zbrain_atlas'
+			Labels [bool](92644 × 294)
+				('origin', 'ZBrain Atlas')
+			!RawSignal [float](92644 × 3000) # raw data
+			Pixels # 3D image to get an idea of image quality
+				TemporalMean [type](612 × 1024 × 20) 
+					('space', 'RAS')
+				Segmentation [bool](612 × 1024 × 20) # mask for TemporalMean; true if neuron, false if non neuron
+			Analysis # can be found from raw data, but still useful and expected
+				Baseline [float](92644 × 3000)
+				DFF [float](92644 × 3000)
+		Stimulus
+			nameofstimulus
+				motorAngle [float](1 × 65669)
+					('unit', 'degrees')
+				motorAngle_time [float](1 × 65669)
+					('unit', 's')			
+		Behavior
+			nameofbehaviour
+				eyeAngle [float](1 × 45330)
+					('unit', 'degrees')
+				eyeAngle_time [float](1 × 45330)
+					('unit', 's')
+				
