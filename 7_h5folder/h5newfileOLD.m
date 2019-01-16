@@ -2,14 +2,13 @@ clear; close all; clc
 
 
 
-%% Defining focus:
+%% Import HDF5 file
 
-root = '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/';
-study = '';
-date = '2018-05-24';
-run = 'Run 08';
-
-F = NT.Focus(root, study, date, run);
+cd '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/Data/2018-05-24/Run 08/Analysis/HDF5'
+hippo = 'h5hippo.h5';
+% stim = h5read(hippo, '/Data/Stimulus');
+hippotemp = H5F.open(hippo);
+name = H5F.get_name(hippotemp);
 
 
 

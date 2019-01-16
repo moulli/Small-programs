@@ -273,10 +273,10 @@ refcoT(:, 2) = max(refcoT(:, 2)) - refcoT(:, 2) + min(refcoT(:, 2));
 figure
 subplot(1, 2, 1)
 scatter3(refco(:, 1), refco(:, 2), refco(:, 3))
-axis([0, 0.5, 0, 1.025])
+axis equal
 subplot(1, 2, 2)
 scatter3(refcoT(:, 1), refcoT(:, 2), refcoT(:, 3))
-axis([0, 0.5, 0, 1.025])
+axis equal
 figure
 hold on
 grid on

@@ -1,4 +1,4 @@
-function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
+function h5switchOLD(h5old_Geoffrey, nfolder, information, overwrite)
 
 
 
@@ -143,40 +143,40 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     h5old_G = [curdir, '/', h5old_Geoffrey];
     % Times:
     Times = h5read(h5old_G, '/Data/Times');
-    h5create(nfolder.filename, '/Data/Brain/Times', size(Times), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Times', single(Times))
+    h5create(nfolder.filename, '/Data/Brain/Times', size(Times), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Times', Times)
     h5writeatt(nfolder.filename, '/Data/Brain/Times', 'unit', 's')    
     % Time delays:
     TimeDelays = h5read(h5old_G, '/Data/TimeDelays');
-    h5create(nfolder.filename, '/Data/Brain/TimeDelays', size(TimeDelays), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/TimeDelays', single(TimeDelays))
+    h5create(nfolder.filename, '/Data/Brain/TimeDelays', size(TimeDelays), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/TimeDelays', TimeDelays)
     h5writeatt(nfolder.filename, '/Data/Brain/TimeDelays', 'unit', 's') 
     % Coordinates:
     Coordinates = h5read(h5old_G, '/Data/Coordinates');
-    h5create(nfolder.filename, '/Data/Brain/Coordinates', size(Coordinates), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Coordinates', single(Coordinates))
+    h5create(nfolder.filename, '/Data/Brain/Coordinates', size(Coordinates), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Coordinates', Coordinates)
     h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'unit', 'mm') 
     h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'space', 'RAS') 
     % Reference coordinates:
     RefCoordinates = h5read(h5old_G, '/Data/RefCoordinates');
-    h5create(nfolder.filename, '/Data/Brain/RefCoordinates', size(RefCoordinates), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/RefCoordinates', single(RefCoordinates))
+    h5create(nfolder.filename, '/Data/Brain/RefCoordinates', size(RefCoordinates), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/RefCoordinates', RefCoordinates)
     h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'unit', 'mm') 
     h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'space', 'RAS') 
     h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'reference brain', 'zbrain atlas')  
     % Labels:
     Labels = h5read(h5old_G, '/Data/Labels');
-    h5create(nfolder.filename, '/Data/Brain/Labels', size(Labels), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Labels', single(Labels))
+    h5create(nfolder.filename, '/Data/Brain/Labels', size(Labels), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Labels', Labels)
     h5writeatt(nfolder.filename, '/Data/Brain/Labels', 'origin', 'zbain atlas') 
     % DFF:
     DFF = h5read(h5old_G, '/Data/Values');
-    h5create(nfolder.filename, '/Data/Brain/Analysis/DFF', size(DFF), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Analysis/DFF', single(DFF))
+    h5create(nfolder.filename, '/Data/Brain/Analysis/DFF', size(DFF), 'Datatype', 'double');
+    h5write(nfolder.filename, '/Data/Brain/Analysis/DFF', DFF)
     % Stimulus:
     Stimulus = h5read(h5old_G, '/Data/Stimulus');
-    h5create(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], size(Stimulus), 'Datatype', 'single')
-    h5write(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], single(Stimulus))
+    h5create(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], size(Stimulus), 'Datatype', 'double')
+    h5write(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], Stimulus)
     h5writeatt(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'unit', 'degrees')
     
     
