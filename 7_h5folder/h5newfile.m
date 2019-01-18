@@ -23,8 +23,11 @@ nfolder.filename = 'testfile1.h5';
 information = struct;
 % information.description = 'test to see.';
 information.autodescription = true;
-information.date = '21/10/2017';
+information.date = '2018-05-24';
 information.run = 6;
+information.rate = 3;
+information.layers = 17;
+information.increment = 4; %in micrometers
 information.line = 'poisson random';
 information.age = 7;
 information.autoID = true;
@@ -40,9 +43,9 @@ information.behaviour = behav;
 
 overwrite = struct;
 overwrite.folder = false;
-overwrite.file = true;
+overwrite.file = false;
 
-h5switch(hippo, nfolder, information, overwrite);
+h5switch(F, nfolder, information, overwrite);
 
 
 
@@ -52,6 +55,15 @@ hdf5test = fullfile(nfolder.path, nfolder.name, nfolder.filename);
 h5disp(hdf5test)
 
 dff = h5read(hdf5test, '/Data/Brain/Analysis/DFF');
-
+dffanim = 0;
+if dffanim
+    figure('units','normalized','outerposition',[0 0 1 1])
+    for i = 1:3000
+        pause(0.000001)
+        plot(dff(:, i))
+        title(['Iteration ', num2str(i)])
+        axis([1, 3000, -0.2, 1])
+    end
+end
 
 

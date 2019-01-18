@@ -1,4 +1,4 @@
-function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
+function h5switch(F, nfolder, information, overwrite)
 
 
 
@@ -22,6 +22,9 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     if ~isfield(information, 'autodescription'); information.description = false; end
     if ~isfield(information, 'date'); error('Please provide date.'); end
     if ~isfield(information, 'run'); error('Please provide run.'); end
+    if ~isfield(information, 'rate'); error('Please provide acquisition rate.'); end
+    if ~isfield(information, 'layers'); error('Please provide number of layers.'); end
+    if ~isfield(information, 'increment'); error('Please provide increment distance.'); end
     if ~isfield(information, 'line'); error('Please provide line.'); end
     if ~isfield(information, 'age'); error('Please provide age.'); end
     if ~isfield(information, 'autoID'); information.autoID = false; end
@@ -59,7 +62,7 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
             fprintf('Folder name already exists. \n');
             if overwrite.folder
                 prompt = 'Are you sure you want to overwrite whole folder? Y/N [Y]: ';
-                inStr = input(prompt,'s');
+                inStr = input(prompt, 's');
                 switch lower(inStr)
                     case 'y'
                         fprintf('Overwriting folder %s. \n', folderall);
@@ -88,7 +91,7 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
             fprintf('File name already exists in folder. \n');
             if overwrite.file
                 prompt = 'Are you sure you want to overwrite file? Y/N [Y]: ';
-                inStr = input(prompt,'s');
+                inStr = input(prompt, 's');
                 switch lower(inStr)
                     case 'y'
                         fprintf('Overwriting file %s. \n', nfolder.filename);
@@ -112,8 +115,12 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     h5create(nfolder.filename, '/Metadata', [1, 1], 'Datatype', 'double');
     h5write(nfolder.filename, '/Metadata', 1)
     % Experiment:
-    h5writeatt(nfolder.filename, '/Metadata', 'Experiment date (jj/mm/dddd)', information.date)
+    h5writeatt(nfolder.filename, '/Metadata', 'Experiment date (dddd/mm/jj)', information.date)
     h5writeatt(nfolder.filename, '/Metadata', 'Experiment run', uint8(information.run))
+    % Acquisition:
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition rate (Hz)', information.rate)
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition number of layers', uint8(information.layers))
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition interlayer distance', information.increment)
     % Fish:
     h5writeatt(nfolder.filename, '/Metadata', 'Fish line', information.line)
     h5writeatt(nfolder.filename, '/Metadata', 'Fish age (dpf)', uint8(information.age))
@@ -136,49 +143,93 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
     
     
     
-    
     %% Data:
     
-    % Getting path to HDF5 file:
-    h5old_G = [curdir, '/', h5old_Geoffrey];
+    % Getting path to HDF5 file from focus:
+    filetemp = strsplit(ls(F.dir('HDF5')));
+    for i = 1:length(filetemp)
+        if isequal(filetemp{i}(end-2:end), '.h5')
+            filetemp = filetemp{i};
+            break
+        end
+    end
+    h5old_G = [F.dir('HDF5'), '/', filetemp];
     % Times:
-    Times = h5read(h5old_G, '/Data/Times');
-    h5create(nfolder.filename, '/Data/Brain/Times', size(Times), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Times', single(Times))
-    h5writeatt(nfolder.filename, '/Data/Brain/Times', 'unit', 's')    
+    h5fill(h5old_G, '/Data/Times', nfolder.filename, '/Data/Brain/Times', 'single', {'unit', 's'})
     % Time delays:
-    TimeDelays = h5read(h5old_G, '/Data/TimeDelays');
-    h5create(nfolder.filename, '/Data/Brain/TimeDelays', size(TimeDelays), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/TimeDelays', single(TimeDelays))
-    h5writeatt(nfolder.filename, '/Data/Brain/TimeDelays', 'unit', 's') 
+    h5fill(h5old_G, '/Data/TimeDelays', nfolder.filename, '/Data/Brain/TimeDelays', 'single', {'unit', 's'})
     % Coordinates:
-    Coordinates = h5read(h5old_G, '/Data/Coordinates');
-    h5create(nfolder.filename, '/Data/Brain/Coordinates', size(Coordinates), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Coordinates', single(Coordinates))
-    h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'unit', 'mm') 
-    h5writeatt(nfolder.filename, '/Data/Brain/Coordinates', 'space', 'RAS') 
+    h5fill(h5old_G, '/Data/Coordinates', nfolder.filename, '/Data/Brain/Coordinates', 'single', {'unit', 'mm'; 'space', 'RAS'})
     % Reference coordinates:
-    RefCoordinates = h5read(h5old_G, '/Data/RefCoordinates');
-    h5create(nfolder.filename, '/Data/Brain/RefCoordinates', size(RefCoordinates), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/RefCoordinates', single(RefCoordinates))
-    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'unit', 'mm') 
-    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'space', 'RAS') 
-    h5writeatt(nfolder.filename, '/Data/Brain/RefCoordinates', 'reference brain', 'zbrain atlas')  
+    h5fill(h5old_G, '/Data/RefCoordinates', nfolder.filename, '/Data/Brain/RefCoordinates', 'single', {'unit', 'mm'; 'space', 'RAS'; 'reference brain', 'zbrain atlas'})
     % Labels:
-    Labels = h5read(h5old_G, '/Data/Labels');
-    h5create(nfolder.filename, '/Data/Brain/Labels', size(Labels), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Labels', single(Labels))
-    h5writeatt(nfolder.filename, '/Data/Brain/Labels', 'origin', 'zbain atlas') 
+    h5fill(h5old_G, '/Data/Labels', nfolder.filename, '/Data/Brain/Labels', 'single', {'origin', 'zbrain atlas'})
     % DFF:
-    DFF = h5read(h5old_G, '/Data/Values');
-    h5create(nfolder.filename, '/Data/Brain/Analysis/DFF', size(DFF), 'Datatype', 'single');
-    h5write(nfolder.filename, '/Data/Brain/Analysis/DFF', single(DFF))
+    h5fill(h5old_G, '/Data/Values', nfolder.filename, '/Data/Brain/Analysis/DFF', 'single')
     % Stimulus:
-    Stimulus = h5read(h5old_G, '/Data/Stimulus');
-    h5create(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], size(Stimulus), 'Datatype', 'single')
-    h5write(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], single(Stimulus))
-    h5writeatt(nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'unit', 'degrees')
+    h5fill(h5old_G, '/Data/Stimulus', nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'single', {'unit', 'degrees'})
     
+    
+    
+    %% Rebuilding raw signal if necessary:
+    
+    % Indication:
+    fprintf('\nMetadata and data filled in %.3f s; building raw data. \n', toc);
+    % Create corrected stack:
+    try 
+        existcorrected = 1;
+        m = Focused.Mmap(F, 'corrected');
+        fprintf('Corrected stack already exists. \n');
+    catch
+        existcorrected = 0;
+        fprintf('Building corrected stack. \n');
+        m = Focused.Mmap(F, 'graystack');
+        F.Analysis.Layers = m.Z;
+        driftApply(F);
+        m = Focused.Mmap(F, 'corrected');
+        fprintf('Corrected stack built (%.3f s). \n', toc);
+    end
+    % Define raw signal matrix:
+    sizeHDF5 = size(h5read(h5old_G, '/Data/TimeDelays'), 1);
+    rawtrace = zeros(sizeHDF5, m.t);
+    % Load neuron shape
+    fprintf('Launching average computation for all neurons segmented. \n');
+    neuCount = 1;
+    layer = 1;
+    for iz = m.Z
+        segPath = F.dir('Segmentation');
+        inputSeg = fullfile(segPath, [num2str(iz, '%02d') '.mat']); % iz = layer
+        load(inputSeg, 'neuronShape');
+        ns = neuronShape;
+        % Average on pixel:
+        for i = 1:length(ns)
+            rawtrace(neuCount, :) = squeeze(mean(m(ns{i}, iz, :), 1))';
+            if mod(i, 1000) == 0
+                fprintf('Iteration %.0f out of %.0f, for layer %.0f out of %.0f, in %.3f seconds. \n', [i, length(ns), layer, length(m.Z), toc]);
+            end
+            neuCount = neuCount + 1;
+        end
+        layer = layer + 1;
+    end
+    % Adding raw signal in HDF5:
+    h5create(nfolder.filename, '/Data/Brain/RawSignal', size(rawtrace), 'Datatype', 'single');
+    h5write(nfolder.filename, '/Data/Brain/RawSignal', cast(rawtrace, 'single'))
+    % Deleting corrected stack:
+    if existcorrected == 0
+        while 1
+            prompt = 'Do you want to keep corrected.stack? Y/N [Y]: ';
+            inStr = input(prompt, 's');
+            switch lower(inStr)
+                case 'y'
+                    break
+                case 'n'
+                    fclose('all');
+                    rmdir(F.dir('corrected'), 's')
+                    break
+            end
+        end
+    end
+        
     
     
     %% Description:
@@ -204,3 +255,37 @@ function h5switch(h5old_Geoffrey, nfolder, information, overwrite)
 
 
 end
+
+
+
+%% Fill HDF5 function:
+function h5fill(hdf5name, hdf5pathold, hdf5filename, hdf5pathnew, datatype, hdf5attributes)
+% Function that automatically fills new HDF5 with old HDF5. 
+% Inputs:
+%    -- hdf5name: name of old HDF5.
+%    -- hdf5pathold: path to data in old HDF5.
+%    -- hdf5filename: name of new HDF5.
+%    -- hdf5pathnew: path to data in new HDF5.
+%    -- datatype: type of data for new HDF5.
+%    -- hdf5attributes: {n x 2} cell of attributes for new HDF5.    
+    
+    % Getting info from old HDF5:
+    temp = h5read(hdf5name, hdf5pathold);
+    % Creating new path in new HDF5 and filling it:
+    h5create(hdf5filename, hdf5pathnew, size(temp), 'Datatype', datatype);
+    h5write(hdf5filename, hdf5pathnew, cast(temp, datatype))
+    % Adding attributes:
+    if nargin == 6
+        numatt = size(hdf5attributes, 1);
+        if numatt ~= 0
+            for i = 1:numatt
+                h5writeatt(hdf5filename, hdf5pathnew, hdf5attributes{i, 1}, hdf5attributes{i, 2})
+            end
+        end
+    end
+
+end
+    
+    
+    
+    
