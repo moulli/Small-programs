@@ -315,38 +315,38 @@ zlabel('z-coordinate', 'Interpreter', 'latex')
 
 
 
-% t = (0:0.001:5); 
-% s1 = sin(2*pi*t./1.5 + 0.3); 
-% s2c = 3;
-% switch s2c
-%     case 1
-%         s2 = mod(t, 1);
-%     case 2
-%         s2 = randn(size(t));
-%     case 3
-%         s2 = sin(2*pi*t./1.5 + 0.3).*randn(size(t));
-% end
-% figure; subplot(4, 2, 1); plot(s1); subplot(4, 2, 2); plot(s2)
-% Ainit = [0.9, -0.5; -1.5, 1.9];
-% xinit = Ainit * [s1; s2];
-% x1 = xinit(1, :); x2 = xinit(2, :);
-% subplot(4, 2, 3); plot(x1); subplot(4, 2, 4); plot(x2)
-% x = [x1; x2];
-% A = fast_ica(x, 2, 200);
-% s = A \ x;
-% subplot(4, 2, 5); plot(s(1, :)); subplot(4, 2, 6); plot(s(2, :))
-% addpath(genpath('~/Downloads'))
-% [Out1, Out2, Out3] = fastica(x);
-% subplot(4, 2, 7); plot(Out1(1, :)); subplot(4, 2, 8); plot(Out1(2, :))
-% 
-% n2 = size(dffn, 1);
-% A2 = fast_ica(dffn(1:n2, :), ceil(n2/20), 500);
-% figure; for i = 1:20; subplot(4, 5, i); plot(dffn(i, :)); end
-% s2 = A2 \ dffn(1:n2, :);
-% figure; for i = 1:min([20, size(A2, 2)]); subplot(4, 5, i); plot(s2(i, :)); end
-% A3 = A2 ./ std(s2, [], 2)';
-% figure; subplot(4, 1, 1:3); image(abs(A2) ./ sum(abs(A2), 2), 'CDataMapping', 'scaled'); colorbar
-% subplot(4, 1, 4); plot(mean(abs(A2) ./ sum(abs(A2), 2)))
+t = (0:0.001:5); 
+s1 = sin(2*pi*t./1.5 + 0.3); 
+s2c = 3;
+switch s2c
+    case 1
+        s2 = mod(t, 1);
+    case 2
+        s2 = randn(size(t));
+    case 3
+        s2 = sin(2*pi*t./1.5 + 0.3).*randn(size(t));
+end
+figure; subplot(4, 2, 1); plot(s1); subplot(4, 2, 2); plot(s2)
+Ainit = [0.9, -0.5; -1.5, 1.9];
+xinit = Ainit * [s1; s2];
+x1 = xinit(1, :); x2 = xinit(2, :);
+subplot(4, 2, 3); plot(x1); subplot(4, 2, 4); plot(x2)
+x = [x1; x2];
+A = fast_ica(x, 2, 200);
+s = A \ x;
+subplot(4, 2, 5); plot(s(1, :)); subplot(4, 2, 6); plot(s(2, :))
+addpath(genpath('~/Downloads'))
+[Out1, Out2, Out3] = fastica(x);
+subplot(4, 2, 7); plot(Out1(1, :)); subplot(4, 2, 8); plot(Out1(2, :))
+
+n2 = size(dffn, 1)/10;
+A2 = fast_ica(dffn(1:n2, :), ceil(n2/20), 500);
+figure; for i = 1:20; subplot(4, 5, i); plot(dffn(i, :)); end
+s2 = A2 \ dffn(1:n2, :);
+figure; for i = 1:min([20, size(A2, 2)]); subplot(4, 5, i); plot(s2(i, :)); end
+A3 = A2 ./ std(s2, [], 2)';
+figure; subplot(4, 1, 1:3); image(abs(A2) ./ sum(abs(A2), 2), 'CDataMapping', 'scaled'); colorbar
+subplot(4, 1, 4); plot(mean(abs(A2) ./ sum(abs(A2), 2)))
 
 
 % W = (rand(2, 2)-0.5) * 0.012;

@@ -66,6 +66,7 @@ function A = fast_ica(x, pcomponents, nit)
       B = B * real((B'*B)^(-0.5));
     %   W1=W;
       W = B' * whiteningMatrix;    
+      fprintf('%.0f out of %.0f. \n', [i, nit]);
 
     end
 
