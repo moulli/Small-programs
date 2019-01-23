@@ -317,7 +317,7 @@ zlabel('z-coordinate', 'Interpreter', 'latex')
 
 t = (0:0.001:5); 
 s1 = sin(2*pi*t./1.5 + 0.3); 
-s2c = 3;
+s2c = 2;
 switch s2c
     case 1
         s2 = mod(t, 1);
@@ -332,7 +332,7 @@ xinit = Ainit * [s1; s2];
 x1 = xinit(1, :); x2 = xinit(2, :);
 subplot(4, 2, 3); plot(x1); subplot(4, 2, 4); plot(x2)
 x = [x1; x2];
-A = fast_ica(x, 2, 200);
+A = fastICA(x, 200);
 s = A \ x;
 subplot(4, 2, 5); plot(s(1, :)); subplot(4, 2, 6); plot(s(2, :))
 addpath(genpath('~/Downloads'))

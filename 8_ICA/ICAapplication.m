@@ -92,8 +92,40 @@ end
 
 %% ICA on the brain regions:
 
-A = fast_ica(values(bzones{1, 1}, :), size(values(bzones{1, 1}, :), 1));
-s = A \ values(bzones{1, 1}, :);
-[Am, Wm, sm] = fastICA(values(bzones{1, 1}, :), 100);
-figure; subplot(2, 1, 1); hold on; for i = 1:500; plot(s(i, :)); end; subplot(2, 1, 2); hold on; for i = 1:500; plot(sm(i, :)); end
+A = fast_ica(values(bzones{1, 1}, :), 100, 30);
+% s = A \ values(bzones{1, 1}, :);
+X = values(bzones{1, 1}, :);
+[Am, Wm, sm] = fastICA(X, 20, round(size(X, 1)/20));
+Xm = Am * sm;
+if size(sm, 1) < size(X, 1)
+    figure
+    hold on
+    for i = 1:size(sm, 1)
+        plot(sm(i, :))
+    end
+end
+% figure; subplot(2, 1, 1); hold on; for i = 1:500; plot(s(i, :)); end; subplot(2, 1, 2); hold on; for i = 1:500; plot(snew(i, :)); end
+
+smnorm = (sm - mean(sm, 2)) ./ var(sm, [], 2);
+figure
+subplot(1, 2, 1)
+plot(max(abs(smnorm), [], 2), '.')
+subplot(1, 2, 2)
+hist(max(abs(smnorm), [], 2), 30)
+Amvar = Am .* var(sm, [], 2)';
+Ammean = Am * mean(sm, 2);
+Xmnew = Amvar * smnorm + Ammean;
+
+figure
+subplot(4, 4, [1:3, 5:7, 9:11])
+image(log(abs(real(Amvar))), 'CDataMapping', 'scaled')
+colorbar
+subplot(4, 4, 13:15)
+plot(sum(Amvar))
+subplot(4, 4, 4:4:12)
+image(Ammean, 'CDataMapping', 'scaled')
+colorbar
+
+
+
 
