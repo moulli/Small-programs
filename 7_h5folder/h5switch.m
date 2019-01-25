@@ -115,16 +115,16 @@ function h5switch(F, nfolder, information, overwrite)
     h5create(nfolder.filename, '/Metadata', [1, 1], 'Datatype', 'double');
     h5write(nfolder.filename, '/Metadata', 1)
     % Experiment:
-    h5writeatt(nfolder.filename, '/Metadata', 'Experiment date (dddd/mm/jj)', information.date)
+    h5writeatt(nfolder.filename, '/Metadata', 'Experiment date (yyyy-mm-dd)', information.date)
     h5writeatt(nfolder.filename, '/Metadata', 'Experiment run', uint8(information.run))
-    % Acquisition:
-    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition rate (Hz)', information.rate)
-    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition number of layers', uint8(information.layers))
-    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition interlayer distance', information.increment)
     % Fish:
     h5writeatt(nfolder.filename, '/Metadata', 'Fish line', information.line)
     h5writeatt(nfolder.filename, '/Metadata', 'Fish age (dpf)', uint8(information.age))
     h5writeatt(nfolder.filename, '/Metadata', 'Fish ID', information.ID)
+    % Acquisition:
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition rate (Hz)', information.rate)
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition number of layers', uint8(information.layers))
+    h5writeatt(nfolder.filename, '/Metadata', 'Acquisition increment (µm)', information.increment)
     % Stimulus:
     for i = 1:max(n1)
         h5writeatt(nfolder.filename, '/Metadata', ['Stimulus --> ', information.stimulus.name{i}, ' sensory type'], information.stimulus.sensorytype{i})
@@ -161,7 +161,7 @@ function h5switch(F, nfolder, information, overwrite)
     % Coordinates:
     h5fill(h5old_G, '/Data/Coordinates', nfolder.filename, '/Data/Brain/Coordinates', 'single', {'unit', 'mm'; 'space', 'RAS'})
     % Reference coordinates:
-    h5fill(h5old_G, '/Data/RefCoordinates', nfolder.filename, '/Data/Brain/RefCoordinates', 'single', {'unit', 'mm'; 'space', 'RAS'; 'reference brain', 'zbrain atlas'})
+    h5fill(h5old_G, '/Data/ZBrainCoordinates', nfolder.filename, '/Data/Brain/RefCoordinates', 'single', {'unit', 'mm'; 'space', 'RAS'; 'reference brain', 'zbrain atlas'})
     % Labels:
     h5fill(h5old_G, '/Data/Labels', nfolder.filename, '/Data/Brain/Labels', 'single', {'origin', 'zbrain atlas'})
     % DFF:

@@ -4,6 +4,8 @@ clear; close all; clc
 
 %% Defining focus:
 
+addpath(genpath('/home/ljp/Programs/'));
+
 root = '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/';
 study = '';
 date = '2018-05-24';
@@ -55,15 +57,37 @@ hdf5test = fullfile(nfolder.path, nfolder.name, nfolder.filename);
 h5disp(hdf5test)
 
 dff = h5read(hdf5test, '/Data/Brain/Analysis/DFF');
+stim = h5read(hdf5test, '/Data/Stimulus/vestibular1/motorAngle');
 dffanim = 0;
 if dffanim
     figure('units','normalized','outerposition',[0 0 1 1])
+%     [~, indff] = sort(var(dff, [], 2), 'descend');
+%     dffsort = dff(indff, :);
+    mdff = mean(dff);
     for i = 1:3000
         pause(0.000001)
-        plot(dff(:, i))
+        subplot(5, 1, 1:3)
+        plot(dff(:, i), '.')
         title(['Iteration ', num2str(i)])
-        axis([1, 3000, -0.2, 1])
+        axis([1, size(dff, 1), -0.2, 1])
+        subplot(5, 1, 4)
+        hold off
+        plot(mdff)
+        hold on
+        plot(i, mdff(i), 'o', 'MarkerFaceColor', 'r')
+        subplot(5, 1, 5)
+        hold off
+        plot(stim, 'y')
+        hold on
+        plot(i, stim(i), 'or', 'MarkerFaceColor', 'r')
     end
 end
+
+
+
+%% Guillaume's data:
+
+addpath('/home/ljp/Science/Guillaume/Thermotaxis/Datasets')
+h5disp('20171115_Run06_rp_Tset=27.h5')
 
 
