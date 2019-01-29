@@ -126,13 +126,13 @@ function h5switch(F, nfolder, information, overwrite)
     h5writeatt(nfolder.filename, '/Metadata', 'Acquisition number of layers', uint8(information.layers))
     h5writeatt(nfolder.filename, '/Metadata', 'Acquisition increment (µm)', information.increment)
     % Stimulus:
-    for i = 1:max(n1)
+    for i = 1:n1(2)
         h5writeatt(nfolder.filename, '/Metadata', ['Stimulus --> ', information.stimulus.name{i}, ' sensory type'], information.stimulus.sensorytype{i})
         h5writeatt(nfolder.filename, '/Metadata', ['Stimulus --> ', information.stimulus.name{i}, ' stimulus type'], information.stimulus.stimtype{i})
         h5writeatt(nfolder.filename, '/Metadata', ['Stimulus --> ', information.stimulus.name{i}, ' frequency (Hz)'], information.stimulus.frequency{i})
     end
     % Behaviour:
-    for i = 1:max(nb1)
+    for i = 1:nb1(2)
         h5writeatt(nfolder.filename, '/Metadata', ['Behaviour --> ', information.behaviour.name{i}, ' type'], information.behaviour.type{i})
         h5writeatt(nfolder.filename, '/Metadata', ['Behaviour --> ', information.behaviour.name{i}, ' frequency (Hz)'], information.behaviour.frequency{i})
     end
@@ -161,14 +161,16 @@ function h5switch(F, nfolder, information, overwrite)
     % Coordinates:
     h5fill(h5old_G, '/Data/Coordinates', nfolder.filename, '/Data/Brain/Coordinates', 'single', {'unit', 'mm'; 'space', 'RAS'})
     % Reference coordinates:
-    h5fill(h5old_G, '/Data/ZBrainCoordinates', nfolder.filename, '/Data/Brain/RefCoordinates', 'single', {'unit', 'mm'; 'space', 'RAS'; 'reference brain', 'zbrain atlas'})
+    h5fill(h5old_G, '/Data/RefCoordinates', nfolder.filename, '/Data/Brain/ZBrainCoordinates', 'single', {'unit', 'mm'; 'space', 'RAS'; 'reference brain', 'zbrain atlas'})
     % Labels:
     h5fill(h5old_G, '/Data/Labels', nfolder.filename, '/Data/Brain/Labels', 'single', {'origin', 'zbrain atlas'})
     % DFF:
     h5fill(h5old_G, '/Data/Values', nfolder.filename, '/Data/Brain/Analysis/DFF', 'single')
     % Stimulus:
-    h5fill(h5old_G, '/Data/Stimulus', nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'single', {'unit', 'degrees'})
-    
+    for i = 1:n1(2)
+        h5fill(h5old_G, '/Data/Stimulus', nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'single', {'unit', 'degrees'})
+    end
+        
     
     
     %% Rebuilding raw signal if necessary:

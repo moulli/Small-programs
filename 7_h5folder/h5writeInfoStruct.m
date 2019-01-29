@@ -35,8 +35,8 @@ function information = h5writeInfoStruct(F)
     
     %% Fields completed:
     
-    ncomplete = zeros(9, 1);
-    while sum(ncomplete) ~= 9
+    ncomplete = zeros(10, 1);
+    while sum(ncomplete) ~= 10
     
     
     
