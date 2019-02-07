@@ -10,6 +10,10 @@ switch sinstim
         cd '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/Data/2018-05-24/Run 08/Analysis/HDF5'
     case 1
         cd '/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2018-06-14/Run 03/Analysis/HDF5'
+    case 2
+        cd '/home/ljp/Science/GeoffreysComputer/Projects/RLS_Natalia/Data/2018-12-12/Run 02/Analysis/HDF5'
+    case 3
+        cd '/home/ljp/Science/GeoffreysComputer/Projects/RLS_Natalia/Data/2018-12-12/Run 05/Analysis/HDF5'
 end
 
 
@@ -17,34 +21,48 @@ end
 
 %% We can get the info of the file:
 
-hippo = 'h5hippo.h5';
+switch sinstim
+    case 2
+        hippo = '2018-12-12(Run02).h5';
+    case 3
+        hippo = '2018-12-12(Run05).h5';
+    otherwise
+        hippo = 'h5hippo.h5';
+end
 stim = h5read(hippo, '/Data/Stimulus');
 refco = h5read(hippo, '/Data/RefCoordinates');
 dff = h5read(hippo, '/Data/Values');
-dffn = (dff - mean(dff, 2)) ./ std(dff, [], 2);
+% dffn = (dff - mean(dff, 2)) ./ std(dff, [], 2);
 
 
 
 %% Based on this info, we can obtain the data inside:
 
 addpath(genpath('~/Science/Hippolyte'))
-Params.period = 1;
+Params.period = 0;
 [out, variables, perinf] = h5stimreg(hippo, Params);
 figure
-subplot(2, 1, 1)
+subplot(3, 1, 1)
 hold on
 [~, n1] = max(out.R2score);
 plot(perinf{3}(n1, :))
 plot(sum(out.coef(n1, :) .* variables(:, 2:end), 2) + out.intercept(n1))
 plot(perinf{2})
 title('Highest R2 score signal, with regression and stimulus', 'Interpreter', 'latex')
-subplot(2, 1, 2)
+subplot(3, 1, 2)
 hold on
 n2 = randperm(size(perinf{3}, 1), 1);
 plot(perinf{3}(n2, :))
 plot(sum(out.coef(n2, :) .* variables(:, 2:end), 2) + out.intercept(n2))
 plot(perinf{2})
 title('Random signal, with regression and stimulus', 'Interpreter', 'latex')
+subplot(3, 1, 3)
+hold on
+[~, n3] = max(out.coef(:, 3));
+plot(perinf{3}(n3, :))
+plot(sum(out.coef(n3, :) .* variables(:, 2:end), 2) + out.intercept(n3))
+plot(perinf{2})
+title('Highest correlation to positive stimulus, with regression and stimulus', 'Interpreter', 'latex')
 
 
 
@@ -68,6 +86,29 @@ indfin = indcK(compa == 1);
 indfinf = ((1 ./ fstat(indfin)) - (1 ./ max(fstat(indfin)))) ./ (1 ./ min(fstat(indfin)));
 indfinc = ((1 ./ coef(indfin)) - (1 ./ max(coef(indfin)))) ./ (1 ./ min(coef(indfin)));
 indind = (indfinf.*indfinc - min(indfinf.*indfinc)) ./ max(indfinf.*indfinc);
+
+
+% Plot based on coefficients for each variable:
+figure
+for i = 1:4
+    coeftemp = abs(out.coef(:, i));
+    [maxcoef, indcoef] = sort(coeftemp, 'descend');
+    indcK = sort(indcoef(1:ceil(nneu/q)));
+    compa = sum(indcK == indfK', 2);
+    indfintemp = indcK(compa == 1);
+    indfinctemp = ((1 ./ coef(indfintemp)) - (1 ./ max(coef(indfintemp)))) ./ (1 ./ min(coef(indfintemp)));
+    subplot(2, 2, i)
+    hold on
+    grid on
+    axis equal
+    scatter3(refco(indfintemp, 1), refco(indfintemp, 2), refco(indfintemp, 3), [], [0.9*ones(size(indfinctemp)), indfinctemp, 0.9*ones(size(indfinctemp))], '.')
+    axis equal
+    title('Neurons with high regression coefficients', 'Interpreter', 'latex')
+    xlabel('x-coordinate', 'Interpreter', 'latex')
+    ylabel('y-coordinate', 'Interpreter', 'latex')
+    zlabel('z-coordinate', 'Interpreter', 'latex')
+end
+
 
 % Plotting:
 % load('MaskDatabase.mat')
@@ -226,7 +267,7 @@ end
 Params.period = 0;
 [outV, variablesV, perinfV] = h5stimreg(hippo, Params);
 addpath('/home/ljp/Science/Guillaume/Thermotaxis/Datasets')
-hippoT = '20171115_Run06Tset=27.h5';
+hippoT = '20171115_Run06_rp_Tset=27.h5';
 % hippoT = '20180111_Run04Tset=14.h5';
 [outT, variablesT, perinfT] = h5stimreg(hippoT, Params);
 figure

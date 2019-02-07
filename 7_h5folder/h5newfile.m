@@ -45,7 +45,7 @@ information.behaviour = behav;
 
 overwrite = struct;
 overwrite.folder = false;
-overwrite.file = false;
+overwrite.file = true;
 
 h5switch(F, nfolder, information, overwrite);
 
@@ -89,5 +89,23 @@ end
 
 addpath('/home/ljp/Science/Guillaume/Thermotaxis/Datasets')
 h5disp('20171115_Run06_rp_Tset=27.h5')
+
+
+
+%% Working on fillMetaHDF5:
+
+% filename = fullfile(F.dir('HDF5'), [erase(F.name, ' ') '.h5']);
+% filename = '/home/ljp/Science/GeoffreysComputer/Paper_Data/2018_Migault/Data/HDF5normalizedFiles/2018-05-24Run07';
+addpath(genpath('/home/ljp/Programs'))
+information = fillMetaHDF5(F);
+% 
+% attstruct = h5info(filename, '/Metadata')
+% attstruct.Attributes.Name
+
+
+
+
+
+
 
 

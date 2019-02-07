@@ -52,7 +52,8 @@ for i = 1:length(all_files)
             runtemp = all_runs(j).name;
             % If date and run already processed, going on:
             if ~isempty(HDF5created)
-                if sum(filetemp == HDF5created(:, 1)) > 0 && sum(runtemp == HDF5created(:, 2)) > 0
+                ncrtemp = find(filetemp == HDF5created(:, 1));
+                if ~isempty(ncrtemp) && sum(runtemp == HDF5created(ncrtemp, 2)) > 0
                     fprintf('HDF5 for date %s and %s already created, moving on to next one. \n', filetemp, runtemp);
                     continue
                 end
@@ -106,7 +107,12 @@ for i = 1:length(all_files)
                     overwrite.file = false;
 
                     % Creating information structure:
-                    information = h5writeInfoStruct(F);
+                    paramsIN = struct;
+                    paramsIN.rate = 2.5;
+                    paramsIN.layers = 18;
+                    paramsIN.increment = 10;
+                    paramsIN.line = 'Nuclear GCamp6s (Nuc51)';
+                    information = h5writeInfoStruct(F, paramsIN);
                     
                     
                 % h5switch function:

@@ -170,6 +170,14 @@ function h5switch(F, nfolder, information, overwrite)
     for i = 1:n1(2)
         h5fill(h5old_G, '/Data/Stimulus', nfolder.filename, ['/Data/Stimulus/', information.stimulus.name{i}, '/motorAngle'], 'single', {'unit', 'degrees'})
     end
+    
+    % BSD:
+    try
+        h5fill(h5old_G, '/Data/Brain/Analysis/InferredSpikes', nfolder.filename, '/Data/Brain/Analysis/InferredSpikes', 'single')
+        h5fill(h5old_G, '/Data/Brain/Analysis/ThresholdedSpikes', nfolder.filename, '/Data/Brain/Analysis/ThresholdedSpikes', 'single')
+    catch
+        fprintf('No inferred or thresholded spikes in file. \n');
+    end
         
     
     
