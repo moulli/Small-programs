@@ -23,7 +23,7 @@ nh = length(H);
 %% Building grid from HDF5s:
 
 method = 'Correlation analysis';
-increment = 0.02;
+increment = 0.05;
 zgrid = ZBraingrid(method, increment);
 for i = 1:nh
     
@@ -53,7 +53,7 @@ for i = 1:nh
     
     % Adding example to zbraingrid object:
     addDataset(zgrid, attributes_in);
-    zgrid
+    disp(zgrid)
     
 end
 
@@ -61,8 +61,11 @@ end
 
 %% Plotting:
 
-ridval = 0.15;
+ridval = 0.1;
 plotAll(zgrid, 'ridvalues', [-ridval, ridval], 'MarkerSize', 40)
+plotAll(zgrid, 'ridvalues', [-ridval, ridval], 'MarkerSize', 40, 'intercept', true)
+plotSome(zgrid, 'vestibular', 'ridvalues', [-ridval, ridval], 'MarkerSize', 40, 'intercept', true)
+%plotSome(zgridV, 'thermotaxis', 'ridvalues', [-ridval, ridval], 'MarkerSize', 40)
 
 
 

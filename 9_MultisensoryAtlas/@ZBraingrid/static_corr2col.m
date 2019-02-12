@@ -1,4 +1,4 @@
-function Ccolor = aux_corr2col(Ccorrelation, varargin)
+function Ccolor = static_corr2col(Ccorrelation, varargin)
 
 %% Function that adapts higher correlation to darker color.
 %
@@ -47,10 +47,14 @@ function Ccolor = aux_corr2col(Ccorrelation, varargin)
     Ccolorn2 = 1 + Ccorrelation.*(Ccorrelation < 0);
     % Autoscaling if required:
     if autoscale 
-        Ccolorn1 = (Ccolorn1 - min(Ccolorn1)) / (max(Ccolorn1) - min(Ccolorn1));
-        Ccolorn2 = (Ccolorn2 - min(Ccolorn2)) / (max(Ccolorn2) - min(Ccolorn2));
+        if length(unique(Ccolorn1)) ~= 1
+            Ccolorn1 = (Ccolorn1 - min(Ccolorn1)) / (max(Ccolorn1) - min(Ccolorn1));
+        end
+        if length(unique(Ccolorn2)) ~= 1
+            Ccolorn2 = (Ccolorn2 - min(Ccolorn2)) / (max(Ccolorn2) - min(Ccolorn2));
+        end
     end
-    Ccolor = [Ccolorn1, Ccolorn2, ones(size(Ccolorn1))];
+    Ccolor = [Ccolorn2, Ccolorn1.*(Ccorrelation > 0)+Ccolorn2.*(Ccorrelation < 0), Ccolorn1];
 
 
 end

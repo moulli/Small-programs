@@ -1,6 +1,6 @@
 function addDataset(obj, dataset_in)
 
-%% Function that adds information on new data in the ZBraingrid object.
+%% Function that adds information on new data in the ZBraingrid class.
 %
 %  New data is provided through a structure, including new dataset
 %  coordinates and correlation coefficients. 

@@ -47,10 +47,14 @@ function Ccolor = corr2col(Ccorrelation, varargin)
     Ccolorn2 = 1 + Ccorrelation.*(Ccorrelation < 0);
     % Autoscaling if required:
     if autoscale 
-        Ccolorn1 = (Ccolorn1 - min(Ccolorn1)) / (max(Ccolorn1) - min(Ccolorn1));
-        Ccolorn2 = (Ccolorn2 - min(Ccolorn2)) / (max(Ccolorn2) - min(Ccolorn2));
+        if unique(Ccolorn1) ~= 1
+            Ccolorn1 = (Ccolorn1 - min(Ccolorn1)) / (max(Ccolorn1) - min(Ccolorn1));
+        end
+        if unique(Ccolorn2) ~= 1
+            Ccolorn2 = (Ccolorn2 - min(Ccolorn2)) / (max(Ccolorn2) - min(Ccolorn2));
+        end
     end
-    Ccolor = [Ccolorn1, Ccolorn2, ones(size(Ccolorn1))];
+    Ccolor = [Ccolorn1, Ccolorn2, 0.8*ones(size(Ccolorn1))];
 
 
 end

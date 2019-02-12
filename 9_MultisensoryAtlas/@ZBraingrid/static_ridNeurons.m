@@ -1,4 +1,4 @@
-function [Vrid, varargout] = aux_ridNeurons(Vin, ridvalues, varargin)
+function [Vrid, varargout] = static_ridNeurons(Vin, ridvalues, varargin)
 
 %% Function that will get rid of values outside provided interval, and NaNs.
 %
