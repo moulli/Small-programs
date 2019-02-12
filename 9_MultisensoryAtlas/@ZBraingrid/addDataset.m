@@ -24,9 +24,9 @@ function addDataset(obj, dataset_in)
     % Indication:
     tic
     if size(obj.Zneurons, 4) > 1 || sum(obj.Zneuron_number(:)) ~= 0 
-        fprintf('\n\nLaunching function addDataset, attribute of ZBraingrid class. %.0f dataset(s) already added.\n', size(obj.Zneurons, 4));
+        fprintf('\nLaunching function addDataset, attribute of ZBraingrid class. %.0f dataset(s) already added.\n', size(obj.Zneurons, 4));
     else
-        fprintf('\n\nLaunching function addDataset, attribute of ZBraingrid class. First dataset.\n');
+        fprintf('\nLaunching function addDataset, attribute of ZBraingrid class. First dataset.\n');
     end
     % Checking entering structure fields:
     if ~isfield(dataset_in, 'name'); error('Please provide dataset name.'); end

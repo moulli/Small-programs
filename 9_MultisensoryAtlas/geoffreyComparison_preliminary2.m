@@ -23,9 +23,9 @@ nh = length(H);
 %% Building grid from HDF5s:
 
 method = 'Correlation analysis';
-increment = 0.05;
+increment = 0.1;
 zgrid = ZBraingrid(method, increment);
-for i = 1:nh
+for i = [1:nh, 3]
     
     % Creating structure:
     attributes_in = struct;
@@ -56,6 +56,7 @@ for i = 1:nh
     disp(zgrid)
     
 end
+cleanDuplicates(zgrid)
 
 
 

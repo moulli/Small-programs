@@ -23,8 +23,6 @@ function plotSome(obj, subset, varargin)
 
     %% Initialization:
     
-    % Indication:
-    fprintf('\n\nLaunching function plotSome, attribute of ZBraingrid class.\n');
     % Checking inputs:
     intext = ["ridvalues", "autoscale", "MarkerSize", "intercept"];
     ridindication = 0;

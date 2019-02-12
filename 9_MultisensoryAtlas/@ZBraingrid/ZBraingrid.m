@@ -148,9 +148,11 @@ classdef ZBraingrid < handle
         %% Flatten ZBraingrid object across all examples:
         onew = flatten(obj, opt_comment);
         
-        %% clean
+        %% Clean duplicates, if the same dataset is present more than once:
+        cleanDuplicates(obj);
         
-        %% lower_increment
+        %% Create a new object with lower increment:
+        onew = downIncrement(obj, new_increment)
         
     end
     
