@@ -99,6 +99,10 @@ end
 image(vartemp, 'CDataMapping', 'scaled'); colorbar
 title('Correlation coefficient variance for all datasets', 'Interpreter', 'latex')
 
+% %% Loading reference brain:
+% 
+% [X, meta] = nrrdread('/home/ljp/Science/GeoffreysComputer/RefBrains/zBrain_Elavl3-H2BRFP_198layers.nhdr');
+
 
 
 %% Creating a linspace map for the brain and assigning neurons:
@@ -245,12 +249,101 @@ end
 
 
 
+%% Trying new functions create_gridStruct and add_to_gridStruct:
+
+method = 'Correlation analysis';
+increment = 0.005;
+for i = 1:length(H)
+    % Loading data:
+    stimtemp = h5read(H{i}, '/Data/Stimulus/vestibular1/motorAngle');
+    dfftemp = h5read(H{i}, '/Data/Brain/Analysis/DFF');
+    coordtemp = h5read(H{i}, '/Data/Brain/ZBrainCoordinates');
+    % Normalizing:
+    stimntemp = (stimtemp - mean(stimtemp)) / std(stimtemp);
+    dffntemp = (dfftemp - mean(dfftemp, 2)) ./ std(dfftemp, [], 2);
+    % Correlation coefficient:
+    cortemp = sum(dffntemp .* stimntemp, 2) ./ sqrt(sum(dffntemp.^2, 2) .* sum(stimntemp.^2, 2));
+    % Computing gridStruct:
+    if i == 1
+        % If first example:
+        gridStruct = create_gridStruct(method, names{i}, coordtemp, cortemp, increment);
+    else
+        % Otherwise adding info:
+        gridStruct = add_to_gridStruct(gridStruct, names{i}, coordtemp, cortemp);
+    end
+end
+% Plotting with meshgrid:
+xgrid = gridStruct.xgrid;
+ygrid = gridStruct.ygrid;
+zgrid = gridStruct.zgrid;
+Tgrid = gridStruct.Tgrid;
+Cgrid = gridStruct.Cgrid;
+Cgridm = mean(Cgrid, 4);
+% Building meshgrid:
+xmesh = (xgrid(1:end-1)+xgrid(2:end)) / 2;
+ymesh = (ygrid(1:end-1)+ygrid(2:end)) / 2;
+zmesh = (zgrid(1:end-1)+zgrid(2:end)) / 2;
+[Xmesh, Ymesh, Zmesh] = meshgrid(xmesh, ymesh, zmesh);
+Xmesh = permute(Xmesh, [2, 1, 3]);
+Ymesh = permute(Ymesh, [2, 1, 3]);
+Zmesh = permute(Zmesh, [2, 1, 3]);
+% Grid coordinates:
+g_coord = [Xmesh(:), Ymesh(:), Zmesh(:)];
+% Getting rid of unnecessary neurons:
+ridvalues = [-0.15, 0.15];
+[Cgridmlayed, g_coord] = ridNeurons(Cgridm(:), ridvalues, g_coord);
+% Plotting:
+Ccolor = corr2col(Cgridmlayed);
+figure
+scatter3(g_coord(:, 1), g_coord(:, 2), g_coord(:, 3), [], Ccolor, 'filled')
+axis equal
+title('Grid inside Zbrain with correlation', 'Interpreter', 'latex')
+xlabel('x-axis', 'Interpreter', 'latex')
+ylabel('y-axis', 'Interpreter', 'latex')
+zlabel('z-axis', 'Interpreter', 'latex')
 
 
 
-% %% Loading reference brain:
-% 
-% [X, meta] = nrrdread('/home/ljp/Science/GeoffreysComputer/RefBrains/zBrain_Elavl3-H2BRFP_198layers.nhdr');
+%% Comparing the two gridStruct:
+
+% gridStruct:
+load('/home/ljp/Science/Hippolyte/gridStruct.mat')
+method = gridStruct.method;
+names = gridStruct.names;
+xgrid = gridStruct.xgrid;
+ygrid = gridStruct.ygrid;
+zgrid = gridStruct.zgrid;
+Tgrid = gridStruct.Tgrid;
+Cgrid = gridStruct.Cgrid;
+increment = xgrid(2) - xgrid(1);
+% gridStruct2:
+load('/home/ljp/Science/Hippolyte/gridStruct2.mat')
+method2 = gridStruct2.method;
+names2 = gridStruct2.names;
+xgrid2 = gridStruct2.xgrid;
+ygrid2 = gridStruct2.ygrid;
+zgrid2 = gridStruct2.zgrid;
+Tgrid2 = gridStruct2.Tgrid;
+Cgrid2 = gridStruct2.Cgrid;
+increment2 = xgrid2(2) - xgrid2(1);
+
+
+
+%% Checking what is wrong:
+
+n1 = randperm(length(xgrid)-1, 1);
+n2 = randperm(length(ygrid)-1, 1);
+n3 = randperm(length(zgrid)-1, 1);
+X = [xgrid(n1), xgrid(n1+1)], Y = [ygrid(n2), ygrid(n2+1)], Z = [zgrid(n3), zgrid(n3+1)]
+set = 1;
+{coord{set}(Tgrid{n1, n2, n3, set}, :), cor{set}(Tgrid{n1, n2, n3, set}, :), Cgrid(n1, n2, n3, set)}
+set = 2;
+{coord{set}(Tgrid{n1, n2, n3, set}, :), cor{set}(Tgrid{n1, n2, n3, set}, :), Cgrid(n1, n2, n3, set)}
+set = 3;
+{coord{set}(Tgrid{n1, n2, n3, set}, :), cor{set}(Tgrid{n1, n2, n3, set}, :), Cgrid(n1, n2, n3, set)}
+% coord{set}(Tgrid2{n1, n2, n3, set}, :)
+% cor{set}(Tgrid2{n1, n2, n3, set}, :)
+% Cgrid2(n1, n2, n3, set)
 
 
 

@@ -86,6 +86,10 @@ for i = 1:length(all_files)
                         fprintf('No HDF5 file in the focus, moving on to next one. \n');
                         continue
                     end
+                    if isempty(ls(F.dir('HDF5')))
+                        fprintf('No HDF5 file in the focus, moving on to next one. \n');
+                        continue
+                    end
                     
                 
                     % Informing on which file we are doing:
