@@ -106,7 +106,7 @@ classdef ZBraingrid < handle
                 case '.'
                     if length(Sin) == 1
                         onew = builtin('subsref', obj, Sin);
-                    elseif length(Sin) == 2 || Sin(2).type == "()"
+                    elseif length(Sin) == 2
                         otemp = builtin('subsref', obj, Sin(1));
                         onew = builtin('subsref', otemp, Sin(2));
                     else
@@ -152,7 +152,10 @@ classdef ZBraingrid < handle
         cleanDuplicates(obj);
         
         %% Create a new object with lower increment:
-        onew = downIncrement(obj, new_increment)
+        onew = downIncrement(obj, new_increment);
+        
+        %% Create subset object based on a comment keyword research:
+        onew = choseSubset(obj, subset);
         
     end
     

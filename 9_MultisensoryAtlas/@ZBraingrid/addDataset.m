@@ -91,7 +91,7 @@ function addDataset(obj, dataset_in)
                 Zneurons_temp{ix, iy, iz} = Ttemp;
                 cortemp = mean(cor_in(Ttemp));
                 if isnan(cortemp); cortemp = 0; end
-                Zcorrelations_temp(ix, iy, iz) = mean(cortemp);
+                Zcorrelations_temp(ix, iy, iz) = cortemp;
                 Zneuron_number_temp(ix, iy, iz) = length(Ttemp);
             end
         end

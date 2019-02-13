@@ -54,21 +54,36 @@ function onew = downIncrement(obj, new_increment)
     
     %% Filling computed properties:
     
-    [lx, ly, lz] = size(obj.Zneurons);
+    % Getting necessary information:
+    [lx, ly, lz, ~] = size(onew.Zneurons);
+    ld = size(obj.Zneurons, 4);
+    xinc = (obj.xgrid(1:end-1) + obj.xgrid(2:end)) ./ 2;
+    yinc = (obj.ygrid(1:end-1) + obj.ygrid(2:end)) ./ 2;
+    zinc = (obj.zgrid(1:end-1) + obj.zgrid(2:end)) ./ 2;
+    % Concatenating matrices:
+    for id = 1:(ld-1)
+        onew.Zneurons = cat(4, onew.Zneurons, cell(lx, ly, lz, 1));
+        onew.Zcorrelations = cat(4, onew.Zcorrelations, zeros(lx, ly, lz, 1));
+        onew.Zneuron_number = cat(4, onew.Zneuron_number, zeros(lx, ly, lz, 1));
+    end
+    % New neuron assignment:
     for ix = 1:lx
         for iy = 1:ly
             for iz = 1:lz
-%                 % Getting neurons in this part of grid:
-%                 xtemp = (onew.xgrid(ix) <= coord_in(:, 1) & coord_in(:, 1) < onew.xgrid(ix+1));
-%                 ytemp = (onew.ygrid(iy) <= coord_in(:, 2) & coord_in(:, 2) < onew.ygrid(iy+1));
-%                 ztemp = (onew.zgrid(iz) <= coord_in(:, 3) & coord_in(:, 3) < onew.zgrid(iz+1));
-%                 Ttemp = find(xtemp & ytemp & ztemp);
-%                 % Now updating zbraingrid object:
-%                 Zneurons_temp{ix, iy, iz} = Ttemp;
-%                 cortemp = mean(cor_in(Ttemp));
-%                 if isnan(cortemp); cortemp = 0; end
-%                 Zcorrelations_temp(ix, iy, iz) = mean(cortemp);
-%                 Zneuron_number_temp(ix, iy, iz) = length(Ttemp);
+                for id = 1:ld
+                    [ix, iy, iz, id];
+                    % Getting neurons in this part of grid:
+                    xtemp = (onew.xgrid(ix) <= xinc & xinc < onew.xgrid(ix+1));
+                    ytemp = (onew.ygrid(iy) <= yinc & yinc < onew.ygrid(iy+1));
+                    ztemp = (onew.zgrid(iz) <= zinc & zinc < onew.zgrid(iz+1));
+                    Ttemp = obj.Zneurons(xtemp, ytemp, ztemp, id);
+                    onew.Zneurons{ix, iy, iz, id} = sort(cell2mat(Ttemp(:)));
+                    % Computing rest of object:
+                    cortemp = mean(onew.Zcorvect{id}(onew.Zneurons{ix, iy, iz, id}));
+                    if isnan(cortemp); cortemp = 0; end
+                    onew.Zcorrelations(ix, iy, iz, id) = cortemp;
+                    onew.Zneuron_number(ix, iy, iz, id) = length(Ttemp);
+                end
             end
         end
     end
