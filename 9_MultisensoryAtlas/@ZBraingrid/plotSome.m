@@ -140,6 +140,7 @@ function plotSome(obj, subset, varargin)
             Ccolor = ZBraingrid.static_corr2col(Cgridmlayed);
         end
     end
+    
     % Plotting:
     figure
     scatter3(g_coord(:, 1), g_coord(:, 2), g_coord(:, 3), markersize, Ccolor, 'filled')

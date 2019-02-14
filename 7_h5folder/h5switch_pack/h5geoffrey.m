@@ -121,7 +121,12 @@ for i = 1:length(all_files)
                     
                 % h5switch function:
                 
-                    h5switch(F, nfolder, information, overwrite);
+                    try
+                        h5switch(F, nfolder, information, overwrite);
+                    catch
+                        fprintf('\nFile %s %s compromised, moving on to the next one.\n', runtemp, filetemp);
+                        % Still saving it so that it does not run every time
+                    end
                     
 
                 % Saving date and run in the HDF5created matrix:

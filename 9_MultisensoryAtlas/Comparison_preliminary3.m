@@ -7,7 +7,7 @@ addpath(genpath('/home/ljp/Science/Hippolyte/Small-programs'))
 %% Building structure:
 
 method = 'Correlation analysis';
-increment = 0.1;
+increment = 0.005;
 zgrid = ZBraingrid(method, increment);
 
 
