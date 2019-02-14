@@ -125,6 +125,7 @@ function plotSome(obj, subset, varargin)
         zerocor = (Cgridmlayed == 0);
         Cgridmlayed(zerocor) = [];
         g_coord(zerocor, :) = [];
+        Ccolor(zerocor, :) = [];
     end
     
     

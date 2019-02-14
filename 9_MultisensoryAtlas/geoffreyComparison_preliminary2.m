@@ -1,6 +1,6 @@
 clear; close all; clc
 addpath(genpath('/home/ljp/Programs'));
-addpath(genpath('/home/ljp/Science/Hippolyte/small-programs'))
+addpath(genpath('/home/ljp/Science/Hippolyte/Small-programs'))
 
 
 
