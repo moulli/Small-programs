@@ -18,17 +18,21 @@ function plotSome(obj, subset, varargin)
 %    rid of some neurons (cf. aux_ridNeurons). Second 'autoscale', allows
 %    to scale colors in plot (cf. aux_corr2col). Third 'MarkerSize'
 %    (default 30) sets the size of the points in the scatter plot.
+%    'intercept' allows to only plot points that are shared between
+%    datasets, and 'autocrop' on 'off' allows to adapt color scale after
+%    ridvalues.
 
 
 
     %% Initialization:
     
     % Checking inputs:
-    intext = ["ridvalues", "autoscale", "MarkerSize", "intercept"];
+    intext = ["ridvalues", "autoscale", "MarkerSize", "intercept", "autocrop"];
     ridindication = 0;
     scaleindication = 0;
     markersize = 30;
     intindication = 0;
+    cropindication = 0;
     if nargin > 2
         if sum(nargin == [4, 6, 8, 10]) == 0
             error('Input arguments must come by pairs.')
@@ -49,6 +53,12 @@ function plotSome(obj, subset, varargin)
                             intindication = 1;
                         elseif lower(varargin{2*i}) ~= false
                             error('Attribute associated to intercept is wrong.')
+                        end
+                    case 5
+                        if varargin{2*i} == false
+                            cropindication = 1;
+                        elseif lower(varargin{2*i}) ~= true
+                            error('Attribute associated to CropScale is wrong.')
                         end
                     otherwise
                         error('Input arguments must be ridvalues, autoscale, or MarkerSize.')
@@ -95,13 +105,21 @@ function plotSome(obj, subset, varargin)
     % Getting rid of unnecessary neurons:
     Cgridm = mean(obj.Zcorrelations(:, :, :, keepsub), 4);
     Cgridm = Cgridm(:);
+    % If intercept, just keeping neurons in all datasets:
     if intindication == 1
         Itemp = all(obj.Zneuron_number, 4);
         Cgridm = Cgridm(Itemp(:));
         g_coord = g_coord(Itemp(:), :);
     end
+    % Defining color scaling:
+    if scaleindication == 1
+        Ccolor = ZBraingrid.static_corr2col(Cgridm, 'autoscale', autoscale);
+    else
+        Ccolor = ZBraingrid.static_corr2col(Cgridm);
+    end
+    % Getting rid of values:
     if ridindication == 1
-        [Cgridmlayed, g_coord] = ZBraingrid.static_ridNeurons(Cgridm, ridvalues, g_coord);
+        [Cgridmlayed, g_coord, Ccolor] = ZBraingrid.static_ridNeurons(Cgridm, ridvalues, g_coord, Ccolor);
     else
         Cgridmlayed = Cgridm;
         zerocor = (Cgridmlayed == 0);
@@ -113,11 +131,13 @@ function plotSome(obj, subset, varargin)
     
     %% Plotting:
     
-    % Defining color scaling:
-    if scaleindication == 1
-        Ccolor = ZBraingrid.static_corr2col(Cgridmlayed, 'autoscale', autoscale);
-    else
-        Ccolor = ZBraingrid.static_corr2col(Cgridmlayed);
+    % Defining color scaling if no crop:
+    if cropindication == 1
+        if scaleindication == 1
+            Ccolor = ZBraingrid.static_corr2col(Cgridmlayed, 'autoscale', autoscale);
+        else
+            Ccolor = ZBraingrid.static_corr2col(Cgridmlayed);
+        end
     end
     % Plotting:
     figure

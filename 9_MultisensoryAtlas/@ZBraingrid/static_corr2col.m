@@ -31,9 +31,9 @@ function Ccolor = static_corr2col(Ccorrelation, varargin)
             error('Please provide right attribute.')
         elseif string(varargin{1}) ~= 'autoscale'
             error('Input is not an attribute of the function.')
-        elseif sum(string(varargin{2}) == ["on", "off"]) == 0
+        elseif sum(string(varargin{2}) == ["true", "false"]) == 0
             error('Input does not correspond to attribute setting.')
-        elseif string(varargin{2}) == 'off'
+        elseif string(varargin{2}) == "false"
             autoscale = 0;
         end
     end
