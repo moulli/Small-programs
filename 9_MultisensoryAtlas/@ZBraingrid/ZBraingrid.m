@@ -188,7 +188,7 @@ classdef ZBraingrid < handle
         addDataset(obj, dataset_in);
         
         %% Plot all correlations, averaged over all datasets:
-        g_coord = plotAll(obj, varargin);
+        plotAll(obj, varargin);
         
         %% Plot a subset of the correlations:
         plotSome(obj, subset, varargin);

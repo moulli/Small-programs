@@ -1,4 +1,4 @@
-function g_coord = plotAll(obj, varargin)
+function plotAll(obj, varargin)
 
 %% Function that plots averaged correlation in the ZBraingrid class.
 %
