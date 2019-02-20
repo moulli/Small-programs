@@ -44,6 +44,7 @@ function onew = flatten(obj, opt_comment)
     
     onew.Zcorrelations = mean(obj.Zcorrelations, 4);
     onew.Zneuron_number = sum(obj.Zneuron_number, 4);
+    onew.gridsize = size(onew.Zcorrelations);
     
     
     

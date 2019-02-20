@@ -21,8 +21,9 @@ classdef ZBraingrid < handle
         comments
         
         %% Grid:
-        % increment and (x, y, z)-grids:
+        % increment, size and (x, y, z)-grids:
         increment
+        gridsize
         xgrid
         ygrid
         zgrid
@@ -70,12 +71,13 @@ classdef ZBraingrid < handle
             obj.zgrid = 0:increment_in:(0.3 + increment_in(3));
             % Building rest of properties:
             objsize = [length(obj.xgrid), length(obj.ygrid), length(obj.zgrid)];
+            obj.gridsize = [objsize, 0];
             obj.Zcorvect = {};
             obj.Zneurons = cell(objsize - 1);
             obj.Zcorrelations = zeros(objsize - 1);
             obj.Zneuron_number = zeros(objsize - 1);   
             % Indication:
-            fprintf('ZBrain grid object created.\n');
+            % fprintf('ZBrain grid object created.\n');
         end
         
         %% Plus operation:
@@ -97,6 +99,7 @@ classdef ZBraingrid < handle
             onew.Zneurons = cat(4, [o1.Zneurons], [o2.Zneurons]);
             onew.Zcorrelations = cat(4, [o1.Zcorrelations], [o2.Zcorrelations]);
             onew.Zneuron_number = cat(4, [o1.Zneuron_number], [o2.Zneuron_number]);
+            onew.gridsize = size(onew.Zcorrelations);
         end
         
         %% Indexing operation:
@@ -125,6 +128,7 @@ classdef ZBraingrid < handle
                         onew.Zneurons = builtin('subsref', obj.Zneurons, Sin_b);
                         onew.Zcorrelations = builtin('subsref', obj.Zcorrelations, Sin_b);
                         onew.Zneuron_number = builtin('subsref', obj.Zneuron_number, Sin_b);
+                        onew.gridsize = size(onew.Zcorrelations);
                         return
                     else
                         error('ZBraingrid:subsref',...
@@ -182,6 +186,47 @@ classdef ZBraingrid < handle
                     end
                 end
             end
+            onew.gridsize = size(onew.Zcorrelations);
+        end
+        
+        %% Length:
+        function lnew = length(obj)
+        % Function that provides length of ZBraingrid object.
+            lnew = builtin('length', obj.Zcorvect);
+        end
+        
+        %% Fill size for new object version:
+        function fillsize(obj)
+            obj.gridsize = size(obj.Zcorrelations);
+        end
+        
+        %% Saving:
+        function onew = saveobj(obj)
+        % Function that compresses ZBraingrid object and saves it.
+            % Creating new temporary object:
+            onew = ZBraingrid(obj.method, obj.increment);
+            onew.names = obj.names;
+            onew.paths = obj.paths;
+            onew.comments = obj.comments;
+            onew.Zcorvect = obj.Zcorvect;
+            % Find non-zero values:
+            findind = find(obj.Zcorrelations ~= 0);
+            lfind = length(findind);
+            % Fill properties with lighter matrices:
+            onew.gridsize = {obj.gridsize, findind}; % temporary 2 in 1
+            onew.Zcorrelations = obj.Zcorrelations(findind);
+            onew.Zneuron_number = obj.Zneuron_number(findind);
+            % Replace cell with sparse matrix for Zneurons:
+            laycell = obj.Zneurons(findind);
+            maxcell = 0;
+            for i = 1:lfind
+                maxcell = max([maxcell, length(laycell{i})]);
+            end
+            neu_temp = zeros(lfind, maxcell);
+            for i = 1:lfind
+                neu_temp(i, 1:length(laycell{i})) = laycell{i}';
+            end
+            onew.Zneurons = sparse(neu_temp);
         end
         
         %% Add dataset to object:
@@ -216,6 +261,32 @@ classdef ZBraingrid < handle
         
         %% Arranging color for plotting:
         Ccolor = static_corr2col(Ccorrelation, varargin)
+        
+        %% Loading:
+        function onew = loadobj(loaded)
+        % Function that decompresses ZBraingrid object from pathname.
+            % Basic information:
+            onew = ZBraingrid(loaded.method, loaded.increment);
+            onew.names = loaded.names;
+            onew.paths = loaded.paths;
+            onew.comments = loaded.comments;
+            onew.gridsize = loaded.gridsize{1};
+            onew.Zcorvect = loaded.Zcorvect;
+            % Computed information:
+            sizetemp = loaded.gridsize{1};
+            indtemp = loaded.gridsize{2};
+            onew.Zcorrelations = zeros(sizetemp);
+            onew.Zcorrelations(indtemp) = loaded.Zcorrelations;
+            onew.Zneuron_number = zeros(sizetemp);
+            onew.Zneuron_number(indtemp) = loaded.Zneuron_number;
+            onew.Zneurons = cell(sizetemp);
+                % Getting rid of the zeros:
+                zerostemp = (full(loaded.Zneurons) == 0);
+                neutemp = num2cell(full(loaded.Zneurons));
+                neutemp(zerostemp) = {[]}; % to have the same as initial empty values
+                neutemp = num2cell(neutemp, 1);
+            onew.Zneurons(indtemp) = strcat(neutemp{:});
+        end
         
     end
     

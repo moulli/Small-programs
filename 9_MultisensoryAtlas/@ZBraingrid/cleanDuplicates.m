@@ -56,6 +56,7 @@ function cleanDuplicates(obj)
     obj.Zneurons = obj.Zneurons(:, :, :, to_keep);
     obj.Zcorrelations = obj.Zcorrelations(:, :, :, to_keep);
     obj.Zneuron_number = obj.Zneuron_number(:, :, :, to_keep);
+    obj.gridsize = size(obj.Zcorrelations);
 
 
 end

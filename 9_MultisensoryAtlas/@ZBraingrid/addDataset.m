@@ -88,7 +88,11 @@ function addDataset(obj, dataset_in)
                 ztemp = (obj.zgrid(iz) <= coord_in(:, 3) & coord_in(:, 3) < obj.zgrid(iz+1));
                 Ttemp = find(xtemp & ytemp & ztemp);
                 % Now updating zbraingrid object:
-                Zneurons_temp{ix, iy, iz} = Ttemp;
+                if isempty(Ttemp)
+                    Zneurons_temp{ix, iy, iz} = [];
+                else
+                    Zneurons_temp{ix, iy, iz} = Ttemp;
+                end
                 cortemp = mean(cor_in(Ttemp));
                 if isnan(cortemp); cortemp = 0; end
                 Zcorrelations_temp(ix, iy, iz) = cortemp;
@@ -110,6 +114,7 @@ function addDataset(obj, dataset_in)
         obj.Zcorrelations = Zcorrelations_temp;
         obj.Zneuron_number = Zneuron_number_temp;
     end
+    obj.gridsize(4) = obj.gridsize(4) + 1;
     % Indication:
     fprintf('Function addDataset ended in %.2f seconds.\n', toc);
     

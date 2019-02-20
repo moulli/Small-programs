@@ -87,6 +87,7 @@ function onew = downIncrement(obj, new_increment)
             end
         end
     end
+    onew.gridsize = size(onew.Zcorrelations);
 
 
 end
