@@ -281,11 +281,10 @@ classdef ZBraingrid < handle
             onew.Zneuron_number(indtemp) = loaded.Zneuron_number;
             onew.Zneurons = cell(sizetemp);
                 % Getting rid of the zeros:
-                zerostemp = (full(loaded.Zneurons) == 0);
-                neutemp = num2cell(full(loaded.Zneurons));
-                neutemp(zerostemp) = {[]}; % to have the same as initial empty values
+                neutemp = num2cell(loaded.Zneurons);
+                neutemp(find(loaded.Zneurons) == 0) = {[]}; % to have the same as initial empty values
                 neutemp = num2cell(neutemp, 1);
-            onew.Zneurons(indtemp) = strcat(neutemp{:});
+                onew.Zneurons(indtemp) = strcat(neutemp{:});
         end
         
     end
