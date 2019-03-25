@@ -104,9 +104,9 @@ function [A, W, s] = fastICA(X, conv_or_nite, comp_or_var, funct)
     %% Dewhitening  and decentering:
     
     % First values:
-    A = Emod / Dmod * A0;
-    W = pinv(A);
-    s = A \ (X + meanX);
+    A = Emod / Dmod * A0; % mixing matrix
+    W = pinv(A); % demixing matrix
+    s = A \ (X + meanX); % independant sources
     % 
     fprintf('\n\nFunction fastICA ended in %.0f s.\n\n', toc);
 
