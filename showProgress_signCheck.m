@@ -77,8 +77,8 @@ function showProgress_signCheck(iteration, maxvalue, varargin)
     
     if iteration == 1
         fprintf('[');
-        fprintf(progress_sign(end));
-        fprintf(repmat(' ', 1, barlength-1));
+        fprintf(progress_sign);
+        fprintf(repmat(' ', 1, barlength-lsign));
         fprintf(']\n\n');
     end
     
@@ -96,15 +96,9 @@ function showProgress_signCheck(iteration, maxvalue, varargin)
         fprintf(']\n');
     elseif mod(iteration, roundtemp) == 0
         fprintf(repmat('\b', 1, barlength+3));
-%         if lsign == 1
-            fprintf(repmat(progress_bar, 1, floortemp));
-            fprintf(progress_sign);
-            fprintf(repmat('\b', 1, floortemp+lsign-barlength));
-%         else
-%             fprintf(repmat(progress_bar, 1, floortemp-lsign+1));
-%             fprintf(progress_sign(max([1, lsign-floortemp]):end));
-%             fprintf(repmat('\b', 1, floortemp+min([lsign, floortemp-5])-barlength));
-%         end
+        fprintf(repmat(progress_bar, 1, floortemp));
+        fprintf(progress_sign);
+        fprintf(repmat('\b', 1, floortemp+lsign-barlength));
         fprintf(repmat(' ', 1, barlength-lsign-floortemp));
         fprintf(']\n\n'); 
         pause(1)

@@ -28,8 +28,8 @@ if do_aligned
     DFFaligned = zeros(size(dff));
     for i = 1:size(dff, 1)
         DFFaligned(i, :) = interp1(translaTime(i, :), dff(i, :), times);
-%         showProgress(i, size(dff, 1));
-        showProgress_sign(i, size(dff, 1), 50, 50, '>>>', ' ');
+        showProgress(i, size(dff, 1));
+%         showProgress_sign(i, size(dff, 1), 50, 50, '>>>', ' ');
 %         showProgress_signCheck(i, size(dff, 1), 'progress_sign', '>>>', 'progress_bar', ' ');
     end
     fprintf('\n');

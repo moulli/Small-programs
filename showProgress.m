@@ -7,6 +7,12 @@ function showProgress(iteration, maxvalue, division, barlength)
 %   -barlength (default 50): length of progress bar.
 
 
+    %% Possibility to change design:
+    
+    progress_sign = '>';
+    progress_bar = '='; % this should be of length 1
+
+
     %% Default values:
     
     % Automatic values:
@@ -33,9 +39,11 @@ function showProgress(iteration, maxvalue, division, barlength)
     
     %% Initial empty progress bar:
     
+    lsign = length(progress_sign);
     if iteration == 1
-        fprintf('[>');
-        fprintf(repmat(' ', 1, barlength-1));
+        fprintf('[');
+        fprintf(progress_sign);
+        fprintf(repmat(' ', 1, barlength-lsign));
         fprintf(']\n\n');
     end
     
@@ -49,13 +57,14 @@ function showProgress(iteration, maxvalue, division, barlength)
     if iteration == maxvalue
         fprintf(repmat('\b', 1, barlength+5));
         fprintf('[');
-        fprintf(repmat('=', 1, barlength));
+        fprintf(repmat(progress_bar, 1, barlength));
         fprintf(']\n');
     elseif mod(iteration, roundtemp) == 0
         fprintf(repmat('\b', 1, barlength+3));
-        fprintf(repmat('=', 1, floortemp));
-        fprintf('>');
-        fprintf(repmat(' ', 1, barlength-1-floortemp));
+        fprintf(repmat(progress_bar, 1, floortemp));
+        fprintf(progress_sign);
+        fprintf(repmat('\b', 1, floortemp+lsign-barlength));
+        fprintf(repmat(' ', 1, barlength-lsign-floortemp));
         fprintf(']\n\n'); 
     end
 
