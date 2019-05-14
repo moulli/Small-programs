@@ -1,4 +1,4 @@
-function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargin)
+function [tau_rises, tau_decays] = estimateTimeConstantsHDF5(h5_path, varargin)
 % Use Tubiana's BSD algorithm to estimate GCaMP time constants.
 
     % Parallel BSD
@@ -60,6 +60,7 @@ function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargi
             end
         end
     end
+    fprintf('Initialization done.\n');
 %     guess_rise = 0.5;
 %     guess_decay = 3;       % educated guess to find time constants (seconds)
     
@@ -67,16 +68,18 @@ function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargi
     % ----------
     
         % Getting DFF and time
-        % ----------            
-        dff = h5read(h5_path, dffaligned);
-        dff = dff';
-        dff = cast(dff, 'double');
-        time = h5read(h5_path, '/Data/Brain/Times');
-        time = cast(time, 'double');
+        % ----------          
+        dff = h5read(h5_path, dffaligned);  
+        dff = dff';  
+        dff = cast(dff, 'double'); 
+        time = h5read(h5_path, '/Data/Brain/Times'); 
+        time = cast(time, 'double'); 
 
-        dff(abs(dff) > 10*std(dff(:))) = 1e-3;
-        dff(isnan(dff)) = 1e-3;
-        dff(dff == 0) = 1e-3;
+        % Getting rid of too small and nan values
+        % ----------
+        dff(abs(dff) > 10*std(dff(:))) = 1e-3; 
+        dff(isnan(dff)) = 1e-3; 
+        dff(dff == 0) = 1e-3; 
     
         % Getting zones to keep
         % ----------
@@ -85,12 +88,15 @@ function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargi
             try
                 labels = h5read(h5_path, '/Data/Brain/Labels');
             catch
-                labels = addLabels_Hippo(coord);
+                fprintf('Labels not found, computing labels.\n');
+                labels = addLabels(coord);
                 h5create(h5_path, '/Data/Brain/Labels', size(labels), 'Datatype', 'single');
                 h5write(h5_path, '/Data/Brain/Labels', single(labels));
                 h5writeatt(h5_path, '/Data/Brain/Labels', 'origin', 'ZBrain Atlas');
-            end
+            end   
+            % Recovering right label
             labels = labels(:, labelin);
+            % Keeping just one side
             labels = (sum(labels, 2) > 0) & (coord(:, 1) < mean(coord(:, 1)));
             dff = dff(:, labels);
         end
@@ -102,7 +108,7 @@ function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargi
         Oalg.nNeurons = size(dff, 2);       % Number of neurons.
 
         tic
-        fprintf('Estimating time constants... ');
+        fprintf('Estimating time constants... \n');
         switch par
             case true
                 [~, ~, ~, Pphys] = pBSD(dff, Oalg, Palg);
@@ -116,7 +122,7 @@ function [tau_rises, tau_decays] = estimate_time_constants_HDF5(h5_path, varargi
         tau_rises = Pphys.tauRise;
         tau_decays = Pphys.tauDecay;
         
-    % Rest of code
+    % Rest of code (optional)
     % ----------
 
 %     figure;

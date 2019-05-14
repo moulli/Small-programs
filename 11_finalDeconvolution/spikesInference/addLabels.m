@@ -1,4 +1,4 @@
-function labels = addLabels_Hippo(coordinates)
+function labels = addLabels(coordinates)
 % Create ZBrainAtlas label matrix for coordinates in ZBrainAtlas space
 
     % display
