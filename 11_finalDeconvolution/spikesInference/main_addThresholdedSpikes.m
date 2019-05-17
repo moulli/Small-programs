@@ -84,8 +84,8 @@ if ~exist(taufile, 'file')
     taur = 0;
     taud = 0;
     for p = 1:length(ptemp)
-        taur = taur + (tau{p, 1}/length(ptemp));
-        taud = taud + (tau{p, 2}/length(ptemp));
+        taur = taur + (median(tau{p, 1})/length(ptemp));
+        taud = taud + (median(tau{p, 2})/length(ptemp));
     end
     % Save as text file:
     fid = fopen(taufile, 'wt');
