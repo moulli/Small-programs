@@ -1,5 +1,5 @@
 clear; close all; clc
-load('/home/ljp/Science/Hippolyte/MaskDatabase.mat')
+load('/home/ljp/Science/Hippolyte/various_mats/MaskDatabase.mat')
 
 
 
@@ -39,7 +39,7 @@ grid on
 %% Building zlabels005:
 
 % Defining zgrid:
-method = 'ZBraingrid object stacking labels associated to a 0.005mm grid object';
+method = 'ZBraingrid object stacking label outlines associated to a 0.005mm grid object';
 zbrainsize = [0.496, 1.122, 0.276];
 increment = 0.005;
 gridsize = floor(zbrainsize ./ increment);
@@ -68,7 +68,18 @@ for i = 1:length(MaskDatabaseNames)
     addDataset(zlabels005, stemp);
     disp(zlabels005)
 end
-    
+
+
+%% Building matrix to go from index to labels:
+
+if ~exist('zlabels005', 'var')
+    load('/home/ljp/Science/Hippolyte/various_mats/ZGB_labels/zlabels005.mat');
+end
+   
+ind2labels = zeros(prod(zlabels005.gridsize(1:3)), length(zlabels005));
+for i = 1:length(zlabels005)
+    ind2labels(zlabels005(i).Zindex, i) = 1;
+end
     
 
 
