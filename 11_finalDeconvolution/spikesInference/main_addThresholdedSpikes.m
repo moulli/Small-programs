@@ -33,8 +33,7 @@ addpath(genpath('/home/ljp/Programs/BSD'))
 
 % Provide as a cell all the paths to HDF5 necessary to compute tau rise and 
 % tau decay. Inferred spikes will be computed for all these HDF5:
-ptemp = {'/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2019-03-26/Run 10/Analysis/HDF5/2019-03-26(Run10).h5';
-          '/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2019-03-26/Run 09/Analysis/HDF5/2019-03-26(Run09).h5'};
+ptemp = {'/home/ljp/Science/GeoffreysComputer/Projects/RLS/Data/2019-03-26/Run 09/Analysis/HDF5/2019-03-26(Run09).h5'};
 % Provide path to which taur_taud.txt file will be saved:
 psave = '/home/ljp/Science/Hippolyte/Small-programs/11_finalDeconvolution/spikesInference';
       
