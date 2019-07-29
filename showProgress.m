@@ -20,7 +20,7 @@ function showProgress(iteration, maxvalue, division, barlength)
         barlength = 50;
     elseif nargin == 2
         barlength = 50;
-        division = 50;
+        division = min([50, maxvalue]);
     end
     % Check division:
     if division > maxvalue
@@ -59,7 +59,7 @@ function showProgress(iteration, maxvalue, division, barlength)
     % Conditional refresh:
     if iteration == maxvalue
         fprintf(repmat('\b', 1, barlength_n+5));
-        fprintf('[');
+        fprintf('\n[');
         fprintf(repmat(progress_bar, 1, barlength_n));
         fprintf(']\n');
     elseif mod(iteration, roundtemp) == 0

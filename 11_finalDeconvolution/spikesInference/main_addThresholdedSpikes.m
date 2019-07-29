@@ -54,6 +54,7 @@ if do_aligned
             DFFaligned(i, :) = interp1(translaTime(i, :), dff(i, :), times);
             showProgress(i, size(dff, 1)); % DEACTIVATE IF NEEDED
         end
+        DFFaligned(:, 1) = dff(:, 1);
         fprintf('\n');
         % Add DFFaligned to HDF5? If true proceding:
         add_aligned = false; % CHANGE IF NEEDED
