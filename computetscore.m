@@ -6,6 +6,7 @@ function tscores = computetscore(signal, stimulus, time)
 % The F-statistic compares the multilinear regression to a degenerate
 % regression, which means a regression using as the only regressor the
 % constant signal equal to 1.
+% see https://stats.stackexchange.com/questions/44838/how-are-the-standard-errors-of-coefficients-calculated-in-a-regression
     
     
     %% Rearange signal and stimulus
