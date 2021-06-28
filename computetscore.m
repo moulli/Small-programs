@@ -69,5 +69,11 @@ function tscores = computetscore(signal, stimulus, time)
     
     tscores = coefficients ./ standard_error;
     
+    
+%    %% NB: if signal is composed of different signals
+%    
+%    standard_error = sqrt(var_residuals)' * sqrt(diag(pinv(X' * X)))';
+%    tscores = coefficients' ./ standard_error;
+    
 
 end

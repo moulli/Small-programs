@@ -69,11 +69,17 @@ kde.bandwidth(0.0128);
 figure
 kde.plot
 axis equal
+xlabel('x-axis', 'Interpreter', 'latex')
+ylabel('y-axis', 'Interpreter', 'latex')
+zlabel('z-axis', 'Interpreter', 'latex')
 
 % or you can specify parameters without changing them in KDE
 figure
 kde.plot('isovalues', [0.1, 0.2, 0.4], 'increment', 0.0175, 'gridsize', [0.496, 1.122, 0.276])
 axis equal
+xlabel('x-axis', 'Interpreter', 'latex')
+ylabel('y-axis', 'Interpreter', 'latex')
+zlabel('z-axis', 'Interpreter', 'latex')
 % NB: if you want to modify the bandwidth, you have to do it internally.
 
 
@@ -104,11 +110,15 @@ axis equal
 figure
 kde.contour(1) % you have to specify the direction of the projection
 axis equal
+xlabel('y-axis', 'Interpreter', 'latex')
+ylabel('z-axis', 'Interpreter', 'latex')
 
 % and you can specify parameters without changing them in KDE
 figure
 kde.contour(1, 'isovalues', [0.1, 0.2, 0.4], 'increment', 0.0175, 'gridsize', [0.496, 1.122, 0.276])
 axis equal
+xlabel('y-axis', 'Interpreter', 'latex')
+ylabel('z-axis', 'Interpreter', 'latex')
 
 
 %% Project
@@ -117,13 +127,11 @@ axis equal
 project = kde.project(1);
 figure
 image(project, 'CDataMapping', 'scaled')
-axis equal
 
 % and you can specify parameters without changing them in KDE
 project = kde.project(1, 'increment', 0.0175, 'gridsize', [0.496, 1.122, 0.276]);
 figure
 image(project, 'CDataMapping', 'scaled')
-axis equal
 % NB: as explained above, these are the actual PDF values, so isovalues is
 % no longer a parameter.
 
@@ -144,6 +152,8 @@ for i = 1:4
     subplot(2, 2, i)
     kde{i}.contour(2, 'isovalues', 0.05:0.05:0.9, 'increment', 0.015)
     axis equal
+    xlabel('x-axis', 'Interpreter', 'latex')
+    ylabel('z-axis', 'Interpreter', 'latex')
 end
 
 % total distribution
@@ -154,6 +164,8 @@ end
 figure
 kde.contour(2, 'isovalues', 0.05:0.05:0.9, 'increment', 0.015)
 axis equal
+xlabel('x-axis', 'Interpreter', 'latex')
+ylabel('z-axis', 'Interpreter', 'latex')
 
 
 
