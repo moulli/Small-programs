@@ -11,9 +11,7 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
 %   theorem tells us that the sampling frequency fs must be superior or 
 %   equal to 2 times the maximum frequency present in the signal (the 
 %   Nyquist rate).
-% - fcut [double, optional]: frequency for low pass filter. If none
-%   provided, set to Nyquist frequency. 
-% - fanalysis [double, optional]: if this frequency is provided, the
+% - frequency [double, optional]: if this frequency is provided, the
 %   function is just going to project signal on 1 complex exponential with
 %   frequency fanalysis, and return outputs based on that.
 %
@@ -22,8 +20,8 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
 % - A [1D or 2D array]: array of amplitudes associated to frequencies.
 % - phi [1D or 2D array]: array of phases associated to frequencies.
 % - low_pass [function]: signal(s) rebuilt from Fourier coefficients, 
-%   cutting frequency at fcut. Argument of function is time, and the index
-%   of the subsignal in signal can also be provided.
+%   cutting frequency at fcut. Argument of function is fcut, time, and the 
+%   index of the subsignal in signal can also be provided.
 
 
     %% Check inputs
@@ -32,8 +30,7 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
     p = inputParser;
     addRequired(p, 'signal');
     addRequired(p, 'fs');
-    addOptional(p, 'fcut', nan);
-    addOptional(p, 'fanalysis', nan);
+    addOptional(p, 'frequency', nan);
     parse(p, signal, fs, varargin{:});
 
 
@@ -47,25 +44,22 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
         N = size(p.Results.signal, 2);
     end
     
-    % DOES NOT RETURN THE SAME VALUE AS GENERAL ANALYSIS
     % If fanalysis is provided, work is easier
-    if ~isnan(p.Results.fanalysis)
+    if ~isnan(p.Results.frequency)
         % Output frequency
-        f = p.Results.fanalysis;
+        f = p.Results.frequency;
         % Fourrier coefficient
-        Xk = p.Results.signal * exp(-2*pi*1i*f .* (0:(N-1))');
+        Xk = p.Results.signal * exp(-2*pi*1i*p.Results.frequency/fs .* (0:(N-1))');
         % Amplitude
-        A = 2 * abs(Xk) / N;
+        if p.Results.frequency == 0
+            A = abs(Xk) / N;
+        else
+            A = 2 * abs(Xk) / N;
+        end
         % Phase
         phi = angle(Xk);
         % Low pass
-        if isnan(p.Results.fcut)
-            fcut = f(end) + 0.001;
-        else
-            fcut = p.Results.fcut;
-        end
-        cut = (f < fcut);
-        low_pass = @(varargin) low_pass_filter(A, f, phi, cut, varargin);
+        low_pass = @(varargin) low_pass_filter(A, f, phi, varargin);
         % Exit function
         return
     end
@@ -100,31 +94,27 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
     
     %% Build low pass filter with cosines
     
-    % Define cut frequency if not provided
-    if isnan(p.Results.fcut)
-        fcut = f(end) + 0.001;
-    else
-        fcut = p.Results.fcut;
-    end
-    
-    % Build low pass filter based on fcut
-    cut = (f < fcut);
-    low_pass = @(varargin) low_pass_filter(A, f, phi, cut, varargin);
+    % Refer to function below to build low-pass filter
+    low_pass = @(varargin) low_pass_filter(A, f, phi, varargin);
         
         
 end
 
-function out = low_pass_filter(A, f, phi, cut, varargin)
+function out = low_pass_filter(A, f, phi, varargin)
 % This function is going to be low_pass filled with the right values for A,
-% f, phi and cut.
-% varargin is the time, and there is an optional parameter corresponding to
-% the subsignal of the signal to low pass, so that all signal do not have
-% to be computed at all times.
+% f and phi.
+% varargin is the cut frequency and the time, and there is an optional 
+% parameter corresponding to the subsignal of the signal to low pass, so 
+% that all signal do not have to be computed at all times.
 
-    if length(varargin{1}) == 1
-        out = squeeze(sum(A(:, cut) .* cos(2*pi*f(:, cut).*reshape(varargin{1}{1}, 1, 1, length(varargin{1}{1})) + phi(:, cut)), 2));
-    elseif length(varargin{1}) == 2
-        out = squeeze(sum(A(varargin{1}{2}, cut) .* cos(2*pi*f(:, cut).*reshape(varargin{1}{1}, 1, 1, length(varargin{1}{1})) + phi(varargin{1}{2}, cut)), 2));
+    % Define what to keep based on fcut
+    cut = (f < varargin{1}{1}); % varargin{1}{1} is the former fcut
+
+    % Compute output function 
+    if length(varargin{1}) == 2
+        out = squeeze(sum(A(:, cut) .* cos(2*pi*f(:, cut).*reshape(varargin{1}{2}, 1, 1, length(varargin{1}{2})) + phi(:, cut)), 2));
+    elseif length(varargin{1}) == 3
+        out = squeeze(sum(A(varargin{1}{3}, cut) .* cos(2*pi*f(:, cut).*reshape(varargin{1}{2}, 1, 1, length(varargin{1}{2})) + phi(varargin{1}{3}, cut)), 2));
     end
     
 end
