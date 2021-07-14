@@ -39,7 +39,7 @@ function [avg, avg_t] = average_signal(signal, times, period)
     
     % Interpolate based on these points
     s = interp1(times, signal', t, 'spline')';
-    if m == 1; s = reshape(s, 1, length(s)); end % otherwise it does not work with 1D arrays
+    if m == 1; s = reshape(s, 1, length(s)); end % otherwise 
     
     
     %% Average on a period

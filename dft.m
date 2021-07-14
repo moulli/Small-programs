@@ -39,9 +39,10 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
     % Input signal
     if size(p.Results.signal, 1) == 1 || size(p.Results.signal, 2) == 1
         N = length(p.Results.signal);
-        p.Results.signal = reshape(p.Results.signal, 1, N);
+        signal = reshape(p.Results.signal, 1, N);
     else
         N = size(p.Results.signal, 2);
+        signal = p.Results.signal;
     end
     
     % If fanalysis is provided, work is easier
@@ -49,7 +50,7 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
         % Output frequency
         f = p.Results.frequency;
         % Fourrier coefficient
-        Xk = p.Results.signal * exp(-2*pi*1i*p.Results.frequency/fs .* (0:(N-1))');
+        Xk = signal * exp(-2*pi*1i*p.Results.frequency/fs .* (0:(N-1))');
         % Amplitude
         if p.Results.frequency == 0
             A = abs(Xk) / N;
@@ -76,7 +77,7 @@ function [f, A, phi, low_pass] = dft(signal, fs, varargin)
     expi = exp(-2*pi*1i/N .* k .* n);
     
     % Find Fourier coefficients
-    Xk = p.Results.signal * expi;
+    Xk = signal * expi;
     
     
     %% Get amplitudes and phases for these coefficients
