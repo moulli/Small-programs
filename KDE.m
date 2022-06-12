@@ -247,6 +247,7 @@ classdef KDE < handle
             addOptional(p, 'increment', obj.options.increment, checksize);
             addOptional(p, 'isovalues', obj.options.isovalues, isnotempty);
             addOptional(p, 'gridsize', obj.options.gridsize, checksize);
+            addOptional(p, 'Color', [1, 0, 0]);
             parse(p, varargin{:});
             % meshgrid
             x = 0:p.Results.increment:p.Results.gridsize(1);
@@ -271,7 +272,7 @@ classdef KDE < handle
                 pat = patch(surf);
                 % define style
                 isonormals(X, Y, Z, prob, pat);
-                set(pat, 'FaceColor', 'red', 'EdgeColor', 'none', 'FaceAlpha', alpha(iv)); % set the color, mesh and transparency level of the surface
+                set(pat, 'FaceColor', p.Results.Color, 'EdgeColor', 'none', 'FaceAlpha', alpha(iv)); % set the color, mesh and transparency level of the surface
                 if iv == 1
                     camlight(); 
                 end

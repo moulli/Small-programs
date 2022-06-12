@@ -127,11 +127,13 @@ ylabel('z-axis', 'Interpreter', 'latex')
 project = kde.project(1);
 figure
 image(project, 'CDataMapping', 'scaled')
+axis equal
 
 % and you can specify parameters without changing them in KDE
 project = kde.project(1, 'increment', 0.0175, 'gridsize', [0.496, 1.122, 0.276]);
 figure
 image(project, 'CDataMapping', 'scaled')
+axis equal
 % NB: as explained above, these are the actual PDF values, so isovalues is
 % no longer a parameter.
 

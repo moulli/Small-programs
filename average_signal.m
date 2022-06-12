@@ -1,4 +1,4 @@
-function [avg, avg_t] = average_signal(signal, times, period)
+function [avg, avg_t] = average_signal(signal, times, period, style)
 % This function averages signal, on a time frame equal to period.
 % What it does is it interpolates signal from times to a multiple of the
 % period, before averaging it over a period.
@@ -51,7 +51,11 @@ function [avg, avg_t] = average_signal(signal, times, period)
     for p = 1:(period_closest-1)
         % Index of signal points
         ind = p:(period_closest-1):n;
-        avg(:, p) = sum(s(:, ind), 2) ./ length(ind);
+        if nargin == 4 && isequal(style, 'median')
+            avg(:, p) = median(s(:, ind), 2); 
+        else
+            avg(:, p) = sum(s(:, ind), 2) ./ length(ind);
+        end
     end
     
     % Add first row as last row for periodicity
