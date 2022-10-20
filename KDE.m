@@ -248,6 +248,8 @@ classdef KDE < handle
             addOptional(p, 'isovalues', obj.options.isovalues, isnotempty);
             addOptional(p, 'gridsize', obj.options.gridsize, checksize);
             addOptional(p, 'Color', [1, 0, 0]);
+            addOptional(p, 'shift', [0, 0, 0]);
+            addOptional(p, 'xyz', [1, 2, 3]);
             parse(p, varargin{:});
             % meshgrid
             x = 0:p.Results.increment:p.Results.gridsize(1);
@@ -263,6 +265,17 @@ classdef KDE < handle
             prob = prob ./ max(prob(:));
             % transparency for style
             alpha = linspace(0.1, 0.8, length(p.Results.isovalues));
+            % Select coordinates order
+            xyz = {x, y, z};
+            [X, Y, Z] = meshgrid(xyz{p.Results.xyz(1)}, xyz{p.Results.xyz(2)}, xyz{p.Results.xyz(3)});
+            % Need a manipulation because of the weird meshgrid format
+            xyz_perm = [p.Results.xyz(2), p.Results.xyz(1), p.Results.xyz(3)];
+            xyz_perm(xyz_perm==1) = 0; xyz_perm(xyz_perm==2) = 1; xyz_perm(xyz_perm==0) = 2;
+            prob = permute(prob, xyz_perm);
+            % Add shift
+            X = X + p.Results.shift(1);
+            Y = Y + p.Results.shift(2);
+            Z = Z + p.Results.shift(3);
             % for each isovalue
             for iv = 1:length(p.Results.isovalues)
                 % get isovalue
